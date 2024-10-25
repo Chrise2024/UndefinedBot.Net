@@ -45,17 +45,25 @@ namespace UndefinedBot.Net.Utils
         }
         public static void SafeDeleteFile(string tPath)
         {
-            if (File.Exists(tPath))
+            try
             {
-                File.Delete(tPath);
+                if (File.Exists(tPath))
+                {
+                    File.Delete(tPath);
+                }
             }
+            catch { }
         }
         public static void SafeDeletePath(string tPath)
         {
-            if (Path.Exists(tPath))
+            try
             {
-                Directory.Delete(tPath);
+                if (Path.Exists(tPath))
+                {
+                    Directory.Delete(tPath);
+                }
             }
+            catch { }
         }
         public static string ReadFile(string tPath)
         {

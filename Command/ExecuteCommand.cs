@@ -224,7 +224,7 @@ namespace UndefinedBot.Net.Command
                             Graphics g = Graphics.FromImage(bg);
                             g.DrawImage(TargetAvatar, 0, 0, 640, 640);
                             g.DrawImage(CoverImage, 0, 0, 1200, 640);
-                            TextRender.GenTextImage(QTextCachePath, TargetMsgString,96,1800,13500);
+                            TextRender.GenTextImage(QTextCachePath, TargetMsgString,96,1800,1350);
                             TextRender.GenTextImage(QNNCachePath,TargetName,72,1500,120);
                             Bitmap TextBmp = new(QTextCachePath);
                             Bitmap NameBmp = new(QNNCachePath);
@@ -238,15 +238,15 @@ namespace UndefinedBot.Net.Command
                                 new MsgBuilder()
                                     .Image(ImCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
                             );
-                            FileIO.SafeDeleteFile(ImCachePath);
-                            FileIO.SafeDeleteFile(QNNCachePath);
-                            FileIO.SafeDeleteFile(QTextCachePath);
                             TextBmp.Dispose();
                             NameBmp.Dispose();
                             g.Dispose();
                             bg.Dispose();
                             CoverImage.Dispose();
                             TargetAvatar.Dispose();
+                            FileIO.SafeDeleteFile(ImCachePath);
+                            FileIO.SafeDeleteFile(QNNCachePath);
+                            FileIO.SafeDeleteFile(QTextCachePath);
                         }
                         else
                         {
