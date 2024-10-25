@@ -51,12 +51,11 @@ namespace UndefinedBot.Net.Extra
                 IsLinearText = true,
             };
             SKPoint DrawPosition = new(TextArea.Width / 2, FontSize);
-            int MaxTextElementCount = (int)Math.Floor(TextArea.Width / FontSize);
-            List<List<string>> Lines = SplitString(text,FontSize,TextArea.Width,out List<float> LineWidth);
+            List<List<string>> Lines = SplitString(text,FontSize,TextArea.Width - FontSize * 1.5F, PaintText);
             float yOffset = (TextArea.Height / 2) - (Lines.Count * FontSize / 2);//0;
             for (int i = 0;i < Lines.Count; i++)
             {
-                DrawLine(canvas, Lines[i], MaxTextElementCount, LineWidth[i], new SKPoint(DrawPosition.X, DrawPosition.Y + yOffset), PaintEmoji, PaintText);
+                DrawLine(canvas, Lines[i], new SKPoint(DrawPosition.X, DrawPosition.Y + yOffset), PaintEmoji, PaintText);
                 yOffset += FontSize;
                 if (yOffset + FontSize > TextArea.Height)
                 {
@@ -66,85 +65,100 @@ namespace UndefinedBot.Net.Extra
             PaintEmoji.Dispose();
             PaintText.Dispose();
         }
-        private static void DrawLine(SKCanvas canvas, List<string> LineText,int MaxTextElementCount,float LineWidth, SKPoint LinePosition, SKPaint PaintEmoji, SKPaint PaintText)
+        private static void DrawLine(SKCanvas canvas, List<string> LineText,SKPoint LinePosition, SKPaint PaintEmoji, SKPaint PaintText)
         {
+            //Console.WriteLine(JsonConvert.SerializeObject(LineText));
             float FontSize = PaintText.TextSize;
+            float LineWidth = 0;
+            foreach (string index in LineText)
+            {
+                LineWidth += IsEmoji(index) ? PaintEmoji.MeasureText(index) : PaintText.MeasureText(index);
+            }
             float LPos = LinePosition.X - LineWidth / 2 + FontSize / 2;
+            //Console.WriteLine(LineWidth);
             foreach (string TE in LineText)
             {
                 if (IsEmoji(TE))
                 {
-                    canvas.DrawText(TE, LPos, LinePosition.Y, PaintEmoji);
-                    LPos += PaintEmoji.TextSize * 1.5F;
-                }
-                else if (IsASCII(TE))
-                {
-                    canvas.DrawText(TE, LPos, LinePosition.Y, PaintEmoji);
-                    if (IsFullCode(TE))
-                    {
-                        LPos += PaintText.TextSize * 0.8F;
-                    }
-                    else
-                    {
-                        LPos += PaintText.TextSize * 0.6F;
-                    }
+                    canvas.DrawText(TE, LPos + PaintEmoji.MeasureText(TE) / 2, LinePosition.Y, PaintEmoji);
+                    LPos += PaintEmoji.MeasureText(TE);
                 }
                 else
                 {
-                    canvas.DrawText(TE, LPos, LinePosition.Y, PaintText);
-                    LPos += PaintText.TextSize;
+                    canvas.DrawText(TE, LPos + PaintText.MeasureText(TE) / 2, LinePosition.Y, PaintText);
+                    LPos += PaintText.MeasureText(TE);
                 }
             }
         }
-        private static List<List<string>> SplitString(string input, int FontSize,float Width,out List<float> LW)
+        private static List<List<string>> SplitString(string input, int FontSize,float Width, SKPaint CurrentPaint)
         {
+            Width -= FontSize;
             List<List<string>> output = [];
-            List<string> tmp = [];
-            LW = [];
-            float CLength = FontSize;
+            List<string> TempLine = [];
+            List<string> Elements = [];
+            float CLength = 0;
+            //float TempLength = 0;
             TextElementEnumerator ElementEnumerator = StringInfo.GetTextElementEnumerator(input);
             ElementEnumerator.Reset();
             while (ElementEnumerator.MoveNext())
             {
-                string CTE = ElementEnumerator.GetTextElement();
-                tmp.Add(CTE);
-                if (IsEmoji(CTE))
+                Elements.Add(ElementEnumerator.GetTextElement());
+            }
+            if (Elements.Count > 1)
+            {
+                string TempString = Elements[0];
+                string CurrentElement = Elements[0];
+                for (int index = 1; index < Elements.Count; index++)
                 {
-                    CLength += FontSize * 1.5F;
-                }
-                else if (IsASCII(CTE))
-                {
-                    if (IsFullCode(CTE))
+                    //Console.WriteLine($"{Elements[index]}-{IsEmoji(Elements[index])}");
+                    if (IsEmoji(CurrentElement) == IsEmoji(Elements[index]))
                     {
-                        CLength += FontSize * 0.8F;
+                        TempString += Elements[index];
+                        CurrentElement = Elements[index];
                     }
                     else
                     {
-                        CLength += FontSize * 0.6F;
+                        //TempString += CurrentElement;
+                        TempLine.Add(TempString);
+                        TempString = Elements[index];
+                        CurrentElement = Elements[index];
+                    }
+                    if (IsEmoji(CurrentElement))
+                    {
+                        CLength += CurrentPaint.TextSize * 1.5F;
+                    }
+                    else
+                    {
+                        CLength += CurrentPaint.MeasureText(CurrentElement);
+                    }
+                    //Console.WriteLine(TempString);
+                    if (CLength > Width)
+                    {
+                        if (TempString.Length > 0)
+                        {
+                            TempLine.Add(TempString);
+                            TempString = "";
+                            //CurrentElement = Elements[index];
+                        }
+                        output.Add(TempLine);
+                        TempLine = [];
+                        CLength = 0;
                     }
                 }
-                else
+                if (TempString.Length > 0)
                 {
-                    CLength += FontSize;
+                    output.Add([TempString]);
                 }
-                if (CLength > Width)
-                {
-                    LW.Add(CLength - FontSize);
-                    output.Add(tmp);
-                    tmp = new List<string>();
-                    CLength = FontSize;
-                }
+                return output;
             }
-            if (tmp.Count > 0)
+            else
             {
-                LW.Add(CLength - FontSize);
-                output.Add(tmp);
+                return [[input]];
             }
-            return output;
         }
         private static bool IsEmoji(string TextElement)
         {
-            UnicodeCategory UC = CharUnicodeInfo.GetUnicodeCategory(TextElement[0]);
+            UnicodeCategory UC = CharUnicodeInfo.GetUnicodeCategory(TextElement.Length > 0 ? TextElement[0] : ' ');
             return UC == UnicodeCategory.OtherSymbol || UC == UnicodeCategory.ModifierSymbol ||
                    UC == UnicodeCategory.PrivateUse  || UC == UnicodeCategory.Surrogate;
         }
@@ -161,22 +175,6 @@ namespace UndefinedBot.Net.Extra
             else
             {
                 return TextElement[0] >= 0x00 && TextElement[0] < 0xFF;
-            }
-        }
-        private static List<char> FullList = new() {'@','#','$','&'};
-        private static bool IsFullCode(char IC)
-        {
-            return FullList.Contains(IC);
-        }
-        private static bool IsFullCode(string TextElement)
-        {
-            if (TextElement.Length != 1)
-            {
-                return false;
-            }
-            else
-            {
-                return FullList.Contains(TextElement[0]);
             }
         }
     }
