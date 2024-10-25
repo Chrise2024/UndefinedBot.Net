@@ -176,87 +176,94 @@ namespace UndefinedBot.Net.Command
                 else if (Args.Command.Equals("queto"))
                 {
                     //ParamFormat: [TargetMsg]
-                    MsgBodySchematics TargetMsg = await HttpApi.GetMsg(Int32.TryParse(Args.Param[0], out int TargetMsgId) ? TargetMsgId : 0);
-                    if ((TargetMsg.MessageId ?? 0) == 0)
+                    if (Args.Param.Count > 0)
                     {
-                        ExecuteLogger.Error($"Invalid MsgId: {Args.Param[0]}, At Command <{Args.Command}>");
-                        await HttpApi.SendGroupMsg(
-                                Args.GroupId,
-                                new MsgBuilder()
-                                    .Text("无效的Msg").Build()
-                            );
-                    }
-                    else
-                    {
-                        string TargetMsgString = "";
-                        List<JObject> MsgSeq = TargetMsg.Message ?? [];
-                        foreach (JObject index in MsgSeq)
+                        MsgBodySchematics TargetMsg = await HttpApi.GetMsg(Int32.TryParse(Args.Param[0], out int TargetMsgId) ? TargetMsgId : 0);
+                        if ((TargetMsg.MessageId ?? 0) == 0)
                         {
-                            if (index.Value<string>("type")?.Equals("text") ?? false)
-                            {
-                                string TText = index.Value<JObject>("data")?.Value<string>("text") ?? "";
-                                if (TText.Length != 0 || !RegexProvider.GetEmptyStringRegex().IsMatch(TText))
-                                {
-                                    TargetMsgString += TText;
-                                }
-                            }
-                            else if (index.Value<string>("type")?.Equals("at") ?? false)
-                            {
-                                TargetMsgString += (index.Value<JObject>("data")?.Value<string>("name") ?? "@") + " ";
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
-                        long TargetUin = TargetMsg.Sender?.UserId ?? 0;
-                        GroupMemberSchematics CMember = await HttpApi.GetGroupMember(Args.GroupId, TargetUin);
-                        string TargetName = $"@{CMember.Nickname ?? ""}";
-                        string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
-                        string QSplashPath = Path.Join(Program.GetProgramLocal(), "QSplash.png");
-                        string QTextCachePath = Path.Join(Program.GetProgramCahce(), $"Text_{DateTime.Now:HH-mm-ss}.png");
-                        string QNNCachePath = Path.Join(Program.GetProgramCahce(), $"NickName_{DateTime.Now:HH-mm-ss}.png");
-                        if (File.Exists(QSplashPath))
-                        {
-                            Image CoverImage = Image.FromFile(QSplashPath);
-                            Image TargetAvatar = await HttpApi.GetQQAvatar(TargetUin);
-                            Bitmap bg = new(1200, 640);
-                            Graphics g = Graphics.FromImage(bg);
-                            g.DrawImage(TargetAvatar, 0, 0, 640, 640);
-                            g.DrawImage(CoverImage, 0, 0, 1200, 640);
-                            TextRender.GenTextImage(QTextCachePath, TargetMsgString,96,1800,1350);
-                            TextRender.GenTextImage(QNNCachePath,TargetName,72,1500,120);
-                            Bitmap TextBmp = new(QTextCachePath);
-                            Bitmap NameBmp = new(QNNCachePath);
-                            g.DrawImage(TextBmp, 575, 95, 600, 450);
-                            g.DrawImage(NameBmp, 600, 600, 500, 40);
-                            //g.DrawString(TargetMsgString, new Font("Noto Color Emoji", 40, FontStyle.Regular), new SolidBrush(Color.White), new RectangleF(440, 170, 800, 300), format);
-                            //g.DrawString(TargetName, new Font("Noto Color Emoji", 24, FontStyle.Regular), new SolidBrush(Color.White), new RectangleF(690, 540, 300, 80), format);
-                            bg.Save(ImCachePath, ImageFormat.Png);
+                            ExecuteLogger.Error($"Invalid MsgId: {Args.Param[0]}, At Command <{Args.Command}>");
                             await HttpApi.SendGroupMsg(
-                                Args.GroupId,
-                                new MsgBuilder()
-                                    .Image(ImCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
-                            );
-                            TextBmp.Dispose();
-                            NameBmp.Dispose();
-                            g.Dispose();
-                            bg.Dispose();
-                            CoverImage.Dispose();
-                            TargetAvatar.Dispose();
-                            FileIO.SafeDeleteFile(ImCachePath);
-                            FileIO.SafeDeleteFile(QNNCachePath);
-                            FileIO.SafeDeleteFile(QTextCachePath);
+                                    Args.GroupId,
+                                    new MsgBuilder()
+                                        .Text("无效的Msg").Build()
+                                );
                         }
                         else
                         {
-                            ExecuteLogger.Error($"Generate Failed, At Command <{Args.Command}>");
-                            await HttpApi.SendGroupMsg(
-                                Args.GroupId,
-                                new MsgBuilder()
-                                    .Text("生成失败").Build()
-                            );
+                            string TargetMsgString = "";
+                            List<JObject> MsgSeq = TargetMsg.Message ?? [];
+                            foreach (JObject index in MsgSeq)
+                            {
+                                if (index.Value<string>("type")?.Equals("text") ?? false)
+                                {
+                                    string TText = index.Value<JObject>("data")?.Value<string>("text") ?? "";
+                                    if (TText.Length != 0 || !RegexProvider.GetEmptyStringRegex().IsMatch(TText))
+                                    {
+                                        TargetMsgString += TText;
+                                    }
+                                }
+                                else if (index.Value<string>("type")?.Equals("at") ?? false)
+                                {
+                                    TargetMsgString += (index.Value<JObject>("data")?.Value<string>("name") ?? "@") + " ";
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            long TargetUin = TargetMsg.Sender?.UserId ?? 0;
+                            GroupMemberSchematics CMember = await HttpApi.GetGroupMember(Args.GroupId, TargetUin);
+                            string TargetName = $"@{CMember.Nickname ?? ""}";
+                            string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
+                            string QSplashPath = Path.Join(Program.GetProgramLocal(), "QSplash.png");
+                            string QTextCachePath = Path.Join(Program.GetProgramCahce(), $"Text_{DateTime.Now:HH-mm-ss}.png");
+                            string QNNCachePath = Path.Join(Program.GetProgramCahce(), $"NickName_{DateTime.Now:HH-mm-ss}.png");
+                            if (File.Exists(QSplashPath))
+                            {
+                                Image CoverImage = Image.FromFile(QSplashPath);
+                                Image TargetAvatar = await HttpApi.GetQQAvatar(TargetUin);
+                                Bitmap bg = new(1200, 640);
+                                Graphics g = Graphics.FromImage(bg);
+                                g.DrawImage(TargetAvatar, 0, 0, 640, 640);
+                                g.DrawImage(CoverImage, 0, 0, 1200, 640);
+                                TextRender.GenTextImage(QTextCachePath, TargetMsgString, 96, 1800, 1350);
+                                TextRender.GenTextImage(QNNCachePath, TargetName, 72, 1500, 120);
+                                Bitmap TextBmp = new(QTextCachePath);
+                                Bitmap NameBmp = new(QNNCachePath);
+                                g.DrawImage(TextBmp, 550, 95, 600, 450);
+                                g.DrawImage(NameBmp, 600, 600, 500, 40);
+                                //g.DrawString(TargetMsgString, new Font("Noto Color Emoji", 40, FontStyle.Regular), new SolidBrush(Color.White), new RectangleF(440, 170, 800, 300), format);
+                                //g.DrawString(TargetName, new Font("Noto Color Emoji", 24, FontStyle.Regular), new SolidBrush(Color.White), new RectangleF(690, 540, 300, 80), format);
+                                bg.Save(ImCachePath, ImageFormat.Png);
+                                await HttpApi.SendGroupMsg(
+                                    Args.GroupId,
+                                    new MsgBuilder()
+                                        .Image(ImCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
+                                );
+                                TextBmp.Dispose();
+                                NameBmp.Dispose();
+                                g.Dispose();
+                                bg.Dispose();
+                                CoverImage.Dispose();
+                                TargetAvatar.Dispose();
+                                FileIO.SafeDeleteFile(ImCachePath);
+                                FileIO.SafeDeleteFile(QNNCachePath);
+                                FileIO.SafeDeleteFile(QTextCachePath);
+                            }
+                            else
+                            {
+                                ExecuteLogger.Error($"Generate Failed, At Command <{Args.Command}>");
+                                await HttpApi.SendGroupMsg(
+                                    Args.GroupId,
+                                    new MsgBuilder()
+                                        .Text("生成失败").Build()
+                                );
+                            }
                         }
+                    }
+                    else
+                    {
+                        ExecuteLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
                     }
                 }
                 ExecuteLogger.Info("Execute Finished");

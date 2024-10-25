@@ -147,7 +147,20 @@ namespace UndefinedBot.Net.Command
                     {
                         if (Msg.TryGetValue("data", out var JT))
                         {
-                            return JT.ToObject<JObject>()?.Value<string>("file") ?? "";
+                            JObject? DataObj = JT.ToObject<JObject>();
+                            if (DataObj != null)
+                            {
+                                if (DataObj.TryGetValue("url",out var Temp))
+                                {
+                                    return Temp.ToObject<string>() ?? "";
+                                }
+                                else
+                                {
+                                    return DataObj.Value<string>("file") ?? "";
+                                }
+                            }
+                            //return JT.ToObject<JObject>()?.Value<string>("file") ?? "";
+                            //return JT.ToObject<JObject>()?.Value<string>("url") ?? ( JT.ToObject<JObject>()?.Value<string>("file") ?? "");
                         }
                     }
                 }
