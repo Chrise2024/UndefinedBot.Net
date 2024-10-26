@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Security.Cryptography;
-using System.Xml.Linq;
 using SkiaSharp;
 using ImageMagick;
 using ImageMagick.Drawing;
@@ -180,70 +178,6 @@ namespace UndefinedBot.Net.Extra
                 TransformMethod = ImageSymmetry.SymmetryRD;
             }
             return TransformMethod(PicImage);
-        }
-        public static void GenTextImage(string TempFilePath, string Text, int FontSize, int Width, int Height)
-        {
-            var Surface = SKSurface.Create(new SKImageInfo(Width, Height));
-            SKCanvas Canvas = Surface.Canvas;
-            SKTypeface TypeFace = SKTypeface.FromFamilyName("Segoe UI Emoji");
-            SKPaint Paint = new SKPaint
-            {
-                Typeface = TypeFace,
-                TextSize = FontSize,
-                Color = SKColors.Black,
-                IsAntialias = true,
-                StrokeWidth = 5,
-            };
-            DrawTextWithWrapping(Canvas, Text, new SKRect(0, 0, Width, Height), Paint);
-            SKImage TempImage = Surface.Snapshot();
-            SKData TempData = TempImage.Encode(SKEncodedImageFormat.Png, 100);
-            FileStream TempFileStream = File.OpenWrite(TempFilePath);
-            if (TempFileStream != null)
-            {
-                TempData.SaveTo(TempFileStream);
-                TempFileStream.Close();
-            }
-            TempData.Dispose();
-            TempImage.Dispose();
-            Paint.Dispose();
-            TypeFace.Dispose();
-            Canvas.Dispose();
-            Surface.Dispose();
-        }
-        private static void DrawTextWithWrapping(SKCanvas canvas, string text, SKRect TextArea, SKPaint paint)
-        {
-            SKPoint DrawPosition = new(TextArea.Left, TextArea.Top);
-            List<string> words = [];
-            foreach (var item in text)
-            {
-                words.Add($"{item}");
-            }
-            string currentLine = string.Empty;
-            float yOffset = 0;
-
-            foreach (string word in words)
-            {
-                string testLine = currentLine.Length > 0 ? currentLine + word : word;
-                float lineWidth = paint.MeasureText(testLine);
-                if (lineWidth > TextArea.Width)
-                {
-                    canvas.DrawText(currentLine, DrawPosition.X, DrawPosition.Y + yOffset, paint);
-                    yOffset += paint.TextSize;
-                    if (yOffset + paint.TextSize > TextArea.Height)
-                    {
-                        break;
-                    }
-                    currentLine = word;
-                }
-                else
-                {
-                    currentLine = testLine;
-                }
-            }
-            if (!string.IsNullOrEmpty(currentLine))
-            {
-                canvas.DrawText(currentLine, DrawPosition.X, DrawPosition.Y + yOffset, paint);
-            }
         }
     }
 
