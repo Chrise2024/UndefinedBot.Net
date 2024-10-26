@@ -27,7 +27,7 @@ namespace UndefinedBot.Net.NetWork
                     group_id = TargetGroupId,
                     message = MsgChain
                 };
-                Console.WriteLine(JsonConvert.SerializeObject(ReqJSON));
+                //Console.WriteLine(JsonConvert.SerializeObject(ReqJSON));
                 await HClient.PostAsync(HttpPostUrl + "/send_group_msg",
                    new StringContent(
                        JsonConvert.SerializeObject(ReqJSON),

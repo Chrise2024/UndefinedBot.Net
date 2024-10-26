@@ -13,6 +13,9 @@ namespace UndefinedBot.Net.Utils
             "symmet",
             "hito",
             "queto",
+            "invert",
+            "raw",
+            "mix",
         ];
         private readonly JSchema ConfigJsonSchema = JSchema.Parse(
             @"
@@ -32,11 +35,11 @@ namespace UndefinedBot.Net.Utils
 
         private ConfigSchematics Config;
 
-        private readonly ConfigSchematics DefaultConfig = new("http://127.0.0.1:8087/", "http://127.0.0.1:8086", [], "#");
+        private readonly ConfigSchematics DefaultConfig = new("http://127.0.0.1:8087/", "http://127.0.0.1:8085", [], "#");
 
         /*
          * 8087为Bot上报消息的Url，即当前程序开启的Http Server地址
-         * 8086为Bot接收Http请求的Url，即当前程序发送Http请求的地址
+         * 8085为Bot接收Http请求的Url，即当前程序发送Http请求的地址
          */
 
         public ConfigManager()
