@@ -194,6 +194,7 @@ namespace UndefinedBot.Net.Command
                             List<JObject> MsgSeq = TargetMsg.Message ?? [];
                             foreach (JObject index in MsgSeq)
                             {
+                                Console.WriteLine(JsonConvert.SerializeObject(index));
                                 if (index.Value<string>("type")?.Equals("text") ?? false)
                                 {
                                     string TText = index.Value<JObject>("data")?.Value<string>("text") ?? "";
@@ -205,6 +206,11 @@ namespace UndefinedBot.Net.Command
                                 else if (index.Value<string>("type")?.Equals("at") ?? false)
                                 {
                                     TargetMsgString += (index.Value<JObject>("data")?.Value<string>("name") ?? "@") + " ";
+                                }
+                                else if (index.Value<string>("type")?.Equals("face") ?? false)
+                                {
+                                    Console.WriteLine(index.Value<JObject>("data")?.Value<string>("id"));
+                                    TargetMsgString += (TextRender.QFaceReference.TryGetValue(index.Value<JObject>("data")?.Value<string>("id") ?? "-1",out var EmojiString) ? EmojiString : "");
                                 }
                                 else
                                 {
@@ -259,6 +265,111 @@ namespace UndefinedBot.Net.Command
                                         .Text("生成失败").Build()
                                 );
                             }
+                        }
+                    }
+                    else
+                    {
+                        ExecuteLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
+                    }
+                }
+                else if (Args.Command.Equals("invert"))
+                {
+                    //ParamFormat: [MsgId] or [ImageUrl]
+                    if (Args.Param.Count > 0)
+                    {
+                        MagickImage? MIm = null;
+                        if (Args.Param[0].StartsWith("http"))
+                        {
+                            //[ImageUrl]
+                            byte[] ImageBytes = await HttpService.GetBinary(Args.Param[0]);
+                            if (ImageBytes.Length > 0)
+                            {
+                                MIm = new(ImageBytes);
+                            }
+                        }
+                        else
+                        {
+                            //[MsgId]
+                            MsgBodySchematics TargetMsg = await HttpApi.GetMsg(Args.Param[0]);
+                            if ((TargetMsg.MessageId ?? 0) == 0)
+                            {
+                                ExecuteLogger.Error($"Invalid MsgId: {Args.Param[0]}, At Command <{Args.Command}>");
+                                await HttpApi.SendGroupMsg(
+                                        Args.GroupId,
+                                        new MsgBuilder()
+                                            .Text("无效的Msg").Build()
+                                    );
+                            }
+                            else
+                            {
+                                string PicUrl = CommandResolver.ExtractUrlFromMsg(TargetMsg);
+                                byte[] ImageBytes = await HttpService.GetBinary(PicUrl);
+                                if (ImageBytes.Length > 0)
+                                {
+                                    MIm = new(ImageBytes);
+                                }
+                            }
+                        }
+                        if (MIm != null)
+                        {
+                            Console.WriteLine(1);
+                            string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
+                            MIm.Negate();
+                            MIm.Write(ImCachePath);
+                            await HttpApi.SendGroupMsg(
+                                    Args.GroupId,
+                                    new MsgBuilder()
+                                        .Reply(Args.MsgId)
+                                        .Image(ImCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
+                                );
+                            FileIO.SafeDeleteFile(ImCachePath);
+                        }
+                        MIm?.Dispose();
+                    }
+                    else
+                    {
+                        ExecuteLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
+                    }
+                }
+                else if (Args.Command.Equals("raw"))
+                {
+                    //ParamFormat: Any
+                    if (Args.Param.Count > 0)
+                    {
+                        MsgBodySchematics TargetMsg = await HttpApi.GetMsg(Args.Param[0]);
+                        await HttpApi.SendGroupMsg(
+                                        Args.GroupId,
+                                        new MsgBuilder()
+                                            .Text(JsonConvert.SerializeObject(TargetMsg.Message, Formatting.Indented)).Build()
+                                    );
+                    }
+                    else
+                    {
+                        ExecuteLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
+                    }
+                }
+                else if (Args.Command.Equals("mix"))
+                {
+                    //ParamFormat: [Emoji1] [Emoji2]
+                    if (Args.Param.Count > 1)
+                    {
+                        string MixRes = EmojiMix.MixEmoji(Args.Param[0], Args.Param[1]);
+                        if (MixRes.Length > 0)
+                        {
+                            await HttpApi.SendGroupMsg(
+                                            Args.GroupId,
+                                            new MsgBuilder()
+                                                .Reply(Args.MsgId)
+                                                .Image(MixRes,ImageSendType.Url).Build()
+                                        );
+                        }
+                        else
+                        {
+                            await HttpApi.SendGroupMsg(
+                                    Args.GroupId,
+                                    new MsgBuilder()
+                                        .Text("生成失败").Build()
+                                );
                         }
                     }
                     else

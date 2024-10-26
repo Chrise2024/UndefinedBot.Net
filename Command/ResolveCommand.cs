@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UndefinedBot.Net.Extra;
 using UndefinedBot.Net.NetWork;
 using UndefinedBot.Net.Utils;
 
@@ -99,11 +100,23 @@ namespace UndefinedBot.Net.Command
                                 return $" {MsgId} ";
                             }
                         }
+                        else if (CQEntity.CQType.Equals("face"))
+                        {
+                            if (CQEntity.Properties.TryGetValue("id", out var FId))
+                            {
+                                if (TextRender.QFaceReference.TryGetValue(FId, out var Fstring))
+                                return $" {Fstring} ";
+                            }
+                        }
                         else if (CQEntity.CQType.Equals("image"))
                         {
-                            if (CQEntity.Properties.TryGetValue("file", out var ImageUrl))
+                            if (CQEntity.Properties.TryGetValue("url", out var ImageUrl))
                             {
                                 return $" {ImageUrl} ";
+                            }
+                            else
+                            {
+                                return CQEntity.Properties.TryGetValue("file", out var IUrl) ? $" {IUrl} " : " ";
                             }
                         }
                         return " ";
