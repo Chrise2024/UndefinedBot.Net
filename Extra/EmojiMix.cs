@@ -8,19 +8,25 @@ namespace UndefinedBot.Net.Extra
     {
         public static int GetEmojiUnicodePoint(string EmojiString)
         {
-            if (EmojiString.Length == 1)
-            {
-                Rune ER = new(EmojiString[0]);
-                return ER.Value;
+            try{
+                if (EmojiString.Length == 1)
+                {
+                    Rune ER = new(EmojiString[0]);
+                    return ER.Value;
+                }
+                else if (EmojiString.Length > 1)
+                {
+                    Rune ER = new(EmojiString[0], EmojiString[1]);
+                    return ER.Value;
+                }
+               else
+                {
+                    return 0;
+                }
             }
-            else if (EmojiString.Length > 1)
+            catch
             {
-                Rune ER = new(EmojiString[0], EmojiString[1]);
-                return ER.Value;
-            }
-            else
-            {
-                return -1;
+                return 0;
             }
         }
         public static string MixEmoji(string Emoji1,string Emoji2)
