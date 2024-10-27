@@ -311,7 +311,6 @@ namespace UndefinedBot.Net.Command
                         }
                         if (MIm != null)
                         {
-                            Console.WriteLine(1);
                             string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
                             MIm.Negate();
                             MIm.Write(ImCachePath);
@@ -368,6 +367,35 @@ namespace UndefinedBot.Net.Command
                                     Args.GroupId,
                                     new MsgBuilder()
                                         .Text("生成失败").Build()
+                                );
+                        }
+                    }
+                    else
+                    {
+                        ExecuteLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
+                    }
+                }
+                else if (Args.Command.Equals("random"))
+                {
+                    //ParamFormat: [RandomType]
+                    if (Args.Param.Count > 0)
+                    {
+                        string OutUrl = RandomPicture.GetRandomContent(Args.Param[0]);
+                        if (OutUrl.Length > 0)
+                        {
+                            await HttpApi.SendGroupMsg(
+                                            Args.GroupId,
+                                            new MsgBuilder()
+                                                //.Reply(Args.MsgId)
+                                                .Image(OutUrl, ImageSendType.Url).Build()
+                                        );
+                        }
+                        else
+                        {
+                            await HttpApi.SendGroupMsg(
+                                    Args.GroupId,
+                                    new MsgBuilder()
+                                        .Text("获取失败").Build()
                                 );
                         }
                     }

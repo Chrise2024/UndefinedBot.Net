@@ -16,6 +16,7 @@ namespace UndefinedBot.Net.Utils
             "invert",
             "raw",
             "mix",
+            "random",
         ];
         private readonly JSchema ConfigJsonSchema = JSchema.Parse(
             @"

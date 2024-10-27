@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Text;
+using System.Reflection;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -8,9 +10,7 @@ using UndefinedBot.Net.Command;
 using UndefinedBot.Net.Extra;
 using UndefinedBot.Net.NetWork;
 using UndefinedBot.Net.Utils;
-using System.Reflection;
-using System.Drawing.Imaging;
-using System.Globalization;
+using ImageMagick;
 
 namespace UndefinedBot.Net
 {

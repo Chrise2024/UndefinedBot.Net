@@ -9,7 +9,36 @@ namespace UndefinedBot.Net.Extra
     internal class RandomPicture
     {
         private static readonly Random RandomRoot = new();
-        public static string RandomBingWallPaper()
+
+        public static string GetRandomContent(string RandType)
+        {
+            if (RandType.Equals("bg"))
+            {
+                return RandomBingWallPaper();
+            }
+            else if (RandType.Equals("fox"))
+            {
+                return RandomFox();
+            }
+            else if (RandType.Equals("cat"))
+            {
+                return RandomCat();
+            }
+            else if (RandType.Equals("dog"))
+            {
+                return RandomDog();
+            }
+            else if (RandType.Equals("acg"))
+            {
+                return RandomACG();
+            }
+            else if (RandType.Equals("star"))
+            {
+                return RandomStarrySky();
+            }
+            return "";
+        }
+        private static string RandomBingWallPaper()
         {
             try
             {
@@ -30,22 +59,30 @@ namespace UndefinedBot.Net.Extra
                 return "";
             }
         }
-        public static string RandomFox()
+        private static string RandomFox()
         {
             return $"https://randomfox.ca/images/{RandomRoot.Next(1,124)}.jpg";
         }
-        public static string RandomCat()
+        private static string RandomCat()
         {
             try
             {
-                List<JObject> IA = JsonConvert.DeserializeObject<List<JObject>>(HttpRequest.Get("https://api.thecatapi.com/v1/images/search").Result) ?? [];
-                if (IA.Count > 0)
+                if (RandomRoot.Next(1,100) > 64)
                 {
-                    return IA[0].Value<string>("url") ?? "";
+                    List<JObject> IA = JsonConvert.DeserializeObject<List<JObject>>(HttpRequest.Get("https://api.thecatapi.com/v1/images/search").Result) ?? [];
+                    if (IA.Count > 0)
+                    {
+                        return IA[0].Value<string>("url") ?? "";
+                    }
+                    else
+                    {
+                        return "";
+                    }
                 }
                 else
                 {
-                    return "";
+                    JObject Resp = JObject.Parse(HttpRequest.Get("https://nekobot.xyz/api/image?type=neko").Result);
+                    return Resp.Value<string>("message") ?? "";
                 }
             }
             catch
@@ -53,7 +90,7 @@ namespace UndefinedBot.Net.Extra
                 return "";
             }
         }
-        public static string RandomDog()
+        private static string RandomDog()
         {
             try
             {
@@ -67,6 +104,39 @@ namespace UndefinedBot.Net.Extra
                     JObject Resp = JObject.Parse(HttpRequest.Get("https://dog.ceo/api/breeds/image/random").Result);
                     return Resp.Value<string>("message") ?? "";
                 }
+            }
+            catch
+            {
+                return "";
+            }
+        }
+        private static string RandomACG()
+        {
+            try
+            {
+                if (RandomRoot.Next(1, 100) > 50)
+                {
+                    return HttpRequest.Get("https://www.loliapi.com/bg/?type=url").Result.Replace(".cn", ".com");
+                }
+                else
+                {
+                    JObject Resp = JObject.Parse(HttpRequest.Get("https://iw233.cn/api.php?sort=cdniw&type=json").Result);
+                    List<string> IA = Resp["pic"]?.ToObject<List<string>>() ?? [];
+                    return IA.Count > 0 ? IA[0] : "";
+                }
+            }
+            catch
+            {
+                return "";
+            }
+        }
+        private static string RandomStarrySky()
+        {
+            try
+            {
+                JObject Resp = JObject.Parse(HttpRequest.Get("https://moe.jitsu.top/api/?sort=starry&type=json").Result);
+                List<string> IA = Resp["pics"]?.ToObject<List<string>>() ?? [];
+                return IA.Count > 0 ? IA[0] : "";
             }
             catch
             {

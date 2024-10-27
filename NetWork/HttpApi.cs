@@ -16,7 +16,7 @@ namespace UndefinedBot.Net.NetWork
 
         private static readonly HttpClient HClient = new()
         {
-            Timeout = TimeSpan.FromSeconds(5)
+            Timeout = TimeSpan.FromSeconds(20)
         };
 
         private static readonly Logger HApiLogger = new("HttpRequest");
