@@ -55,7 +55,7 @@ namespace UndefinedBot.Net.Command
                         if (Args.Param[1].StartsWith("http"))
                         {
                             //[Pattern] [ImageUrl]
-                            byte[] ImageBytes = await HttpService.GetBinary(Args.Param[1]);
+                            byte[] ImageBytes = await HttpRequest.GetBinary(Args.Param[1]);
                             if (ImageBytes.Length > 0)
                             {
                                 ms = new MemoryStream(ImageBytes);
@@ -79,7 +79,7 @@ namespace UndefinedBot.Net.Command
                             else
                             {
                                 string PicUrl = CommandResolver.ExtractUrlFromMsg(TargetMsg);
-                                byte[] ImageBytes = await HttpService.GetBinary(PicUrl);
+                                byte[] ImageBytes = await HttpRequest.GetBinary(PicUrl);
                                 if (ImageBytes.Length > 0)
                                 {
                                     ms = new MemoryStream(ImageBytes);
@@ -280,7 +280,7 @@ namespace UndefinedBot.Net.Command
                         if (Args.Param[0].StartsWith("http"))
                         {
                             //[ImageUrl]
-                            byte[] ImageBytes = await HttpService.GetBinary(Args.Param[0]);
+                            byte[] ImageBytes = await HttpRequest.GetBinary(Args.Param[0]);
                             if (ImageBytes.Length > 0)
                             {
                                 MIm = new(ImageBytes);
@@ -302,7 +302,7 @@ namespace UndefinedBot.Net.Command
                             else
                             {
                                 string PicUrl = CommandResolver.ExtractUrlFromMsg(TargetMsg);
-                                byte[] ImageBytes = await HttpService.GetBinary(PicUrl);
+                                byte[] ImageBytes = await HttpRequest.GetBinary(PicUrl);
                                 if (ImageBytes.Length > 0)
                                 {
                                     MIm = new(ImageBytes);
