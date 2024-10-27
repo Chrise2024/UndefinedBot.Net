@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Text;
 using UndefinedBot.Net.NetWork;
 
@@ -8,18 +9,18 @@ namespace UndefinedBot.Net.Extra
     {
         public static int GetEmojiUnicodePoint(string EmojiString)
         {
+            
             try{
-                if (EmojiString.Length == 1)
+                if (EmojiString.Length > 0)
                 {
-                    Rune ER = new(EmojiString[0]);
-                    return ER.Value;
+                    StringRuneEnumerator SRE = EmojiString.EnumerateRunes();
+                    foreach (Rune R in SRE)
+                    {
+                        return R.Value;
+                    }
+                    return 0;
                 }
-                else if (EmojiString.Length > 1)
-                {
-                    Rune ER = new(EmojiString[0], EmojiString[1]);
-                    return ER.Value;
-                }
-               else
+                else
                 {
                     return 0;
                 }

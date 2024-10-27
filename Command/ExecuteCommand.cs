@@ -194,11 +194,10 @@ namespace UndefinedBot.Net.Command
                             List<JObject> MsgSeq = TargetMsg.Message ?? [];
                             foreach (JObject index in MsgSeq)
                             {
-                                Console.WriteLine(JsonConvert.SerializeObject(index));
                                 if (index.Value<string>("type")?.Equals("text") ?? false)
                                 {
                                     string TText = index.Value<JObject>("data")?.Value<string>("text") ?? "";
-                                    if (TText.Length != 0 || !RegexProvider.GetEmptyStringRegex().IsMatch(TText))
+                                    if (TText.Length != 0 && !RegexProvider.GetEmptyStringRegex().IsMatch(TText))
                                     {
                                         TargetMsgString += TText;
                                     }
@@ -209,8 +208,8 @@ namespace UndefinedBot.Net.Command
                                 }
                                 else if (index.Value<string>("type")?.Equals("face") ?? false)
                                 {
-                                    Console.WriteLine(index.Value<JObject>("data")?.Value<string>("id"));
-                                    TargetMsgString += (TextRender.QFaceReference.TryGetValue(index.Value<JObject>("data")?.Value<string>("id") ?? "-1",out var EmojiString) ? EmojiString : "");
+                                    string FId = index.Value<JObject>("data")?.Value<string>("id") ?? "";
+                                    TargetMsgString += (TextRender.QFaceReference.TryGetValue(FId,out var EmojiString) ? EmojiString : "");
                                 }
                                 else
                                 {
