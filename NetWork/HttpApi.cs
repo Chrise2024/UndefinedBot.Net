@@ -14,7 +14,10 @@ namespace UndefinedBot.Net.NetWork
     {
         private static readonly string HttpPostUrl = Program.GetConfigManager().GetHttpPostUrl();
 
-        private static readonly HttpClient HClient = new();
+        private static readonly HttpClient HClient = new()
+        {
+            Timeout = TimeSpan.FromSeconds(5)
+        };
 
         private static readonly Logger HApi = new("HttpService");
 
@@ -35,6 +38,12 @@ namespace UndefinedBot.Net.NetWork
                        "application/json"
                    )
                 );
+            }
+            catch (TaskCanceledException ex)
+            {
+                Console.WriteLine("Task Cacled: ");
+                HApi.Error(ex.Message);
+                HApi.Error(ex.StackTrace ?? "");
             }
             catch (Exception ex)
             {
@@ -59,6 +68,12 @@ namespace UndefinedBot.Net.NetWork
                    )
                 );
             }
+            catch (TaskCanceledException ex)
+            {
+                Console.WriteLine("Task Cacled: ");
+                HApi.Error(ex.Message);
+                HApi.Error(ex.StackTrace ?? "");
+            }
             catch (Exception ex)
             {
                 HApi.Error("Error Occured, Error Information:");
@@ -81,7 +96,16 @@ namespace UndefinedBot.Net.NetWork
                        "application/json"
                    )
                 );
+                //Console.WriteLine("GetMsg<T>");
+                Console.WriteLine(response.Content.ReadAsStringAsync().Result);
                 return JObject.Parse(response.Content.ReadAsStringAsync().Result)["data"]?.ToObject<MsgBodySchematics>() ?? new MsgBodySchematics();
+            }
+            catch (TaskCanceledException ex)
+            {
+                Console.WriteLine("Task Cacled: ");
+                HApi.Error(ex.Message);
+                HApi.Error(ex.StackTrace ?? "");
+                return new MsgBodySchematics();
             }
             catch
             {
@@ -107,6 +131,13 @@ namespace UndefinedBot.Net.NetWork
                 );
                 return JObject.Parse(response.Content.ReadAsStringAsync().Result)["data"]?.ToObject<GroupMemberSchematics>() ?? new GroupMemberSchematics();
             }
+            catch (TaskCanceledException ex)
+            {
+                Console.WriteLine("Task Cacled: ");
+                HApi.Error(ex.Message);
+                HApi.Error(ex.StackTrace ?? "");
+                return new GroupMemberSchematics();
+            }
             catch
             {
                 return new GroupMemberSchematics();
@@ -126,6 +157,13 @@ namespace UndefinedBot.Net.NetWork
             {
                 HttpResponseMessage response = await HClient.GetAsync("https://v1.hitokoto.cn/?" + Para);
                 return JsonConvert.DeserializeObject<HitokotoSchematics>(response.Content.ReadAsStringAsync().Result);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Console.WriteLine("Task Cacled: ");
+                HApi.Error(ex.Message);
+                HApi.Error(ex.StackTrace ?? "");
+                return new HitokotoSchematics();
             }
             catch
             {
@@ -149,9 +187,16 @@ namespace UndefinedBot.Net.NetWork
                     return Image.FromFile(Path.Join(Program.GetProgramRoot(), "Local", "512x512.png"));
                 }
             }
+            catch (TaskCanceledException ex)
+            {
+                Console.WriteLine("Task Cacled: ");
+                HApi.Error(ex.Message);
+                HApi.Error(ex.StackTrace ?? "");
+                return new Bitmap(1, 1);
+            }
             catch
             {
-                return Image.FromFile(Path.Join(Program.GetProgramRoot(),"Local", "512x512.png"));
+                return new Bitmap(1,1);
             }
         }
         public static async Task<bool> CheckUin(long TargetGroupId, long TargetUin)

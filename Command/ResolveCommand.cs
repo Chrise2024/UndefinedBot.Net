@@ -188,6 +188,7 @@ namespace UndefinedBot.Net.Command
                 )
             {
                 ArgSchematics Args = Parse(MsgBody);
+                ArgLogger.Info("Parse Complete");
                 if (Args.Status)
                 {
                     CommandExecutor.Execute(Args);

@@ -52,9 +52,9 @@ namespace UndefinedBot.Net.Extra
             { "67" , "💔" },
             { "74" , "🌞" },
             { "75" , "🌛" },
-            { "76" , "👍🏼" },
-            { "77" , "👎🏼" },
-            { "78" , "🤝🏼" },
+            { "76" , "👍" },
+            { "77" , "👎" },
+            { "78" , "🤝" },
             { "79" , "✌" },
             { "97" , "😓" },
             { "98" , "🥱" },
@@ -63,9 +63,9 @@ namespace UndefinedBot.Net.Extra
             { "112" , "🔪" },
             { "114" , "🏀" },
             { "116" , "👄" },
-            { "120" , "✊🏼" },
-            { "123" , "👆🏼" },
-            { "124" , "👌🏼" },
+            { "120" , "✊" },
+            { "123" , "👆" },
+            { "124" , "👌" },
             { "146" , "💢" },
             { "147" , "🍭" },
             { "171" , "🍵" },
@@ -120,7 +120,7 @@ namespace UndefinedBot.Net.Extra
             };
             SKPoint DrawPosition = new(TextArea.Width / 2, FontSize);
             List<List<string>> Lines = SplitString(text,FontSize,TextArea.Width - FontSize * 1.5F, PaintText);
-            float yOffset = (TextArea.Height / 2) - (Lines.Count * FontSize / 2);//0;
+            float yOffset = (TextArea.Height / 2) - (Lines.Count * FontSize / 2);
             for (int i = 0;i < Lines.Count; i++)
             {
                 DrawLine(canvas, Lines[i], new SKPoint(DrawPosition.X, DrawPosition.Y + yOffset), PaintEmoji, PaintText);
@@ -135,7 +135,6 @@ namespace UndefinedBot.Net.Extra
         }
         private static void DrawLine(SKCanvas canvas, List<string> LineText,SKPoint LinePosition, SKPaint PaintEmoji, SKPaint PaintText)
         {
-            //Console.WriteLine(JsonConvert.SerializeObject(LineText));
             float FontSize = PaintText.TextSize;
             float LineWidth = 0;
             foreach (string index in LineText)
@@ -143,7 +142,6 @@ namespace UndefinedBot.Net.Extra
                 LineWidth += IsEmoji(index) ? PaintEmoji.MeasureText(index) : PaintText.MeasureText(index);
             }
             float LPos = LinePosition.X - LineWidth / 2 + FontSize / 2;
-            //Console.WriteLine(LineWidth);
             foreach (string TE in LineText)
             {
                 if (IsEmoji(TE))
@@ -165,7 +163,6 @@ namespace UndefinedBot.Net.Extra
             List<string> TempLine = [];
             List<string> Elements = [];
             float CLength = 0;
-            //float TempLength = 0;
             TextElementEnumerator ElementEnumerator = StringInfo.GetTextElementEnumerator(input);
             ElementEnumerator.Reset();
             while (ElementEnumerator.MoveNext())
@@ -175,38 +172,31 @@ namespace UndefinedBot.Net.Extra
             if (Elements.Count > 1)
             {
                 string TempString = Elements[0];
-                string CurrentElement = Elements[0];
                 for (int index = 1; index < Elements.Count; index++)
                 {
-                    //Console.WriteLine($"{Elements[index]}-{IsEmoji(Elements[index])}");
-                    if (IsEmoji(CurrentElement) == IsEmoji(Elements[index]))
+                    if (IsEmoji(Elements[index - 1]) == IsEmoji(Elements[index]))
                     {
                         TempString += Elements[index];
-                        CurrentElement = Elements[index];
                     }
                     else
                     {
-                        //TempString += CurrentElement;
                         TempLine.Add(TempString);
                         TempString = Elements[index];
-                        CurrentElement = Elements[index];
                     }
-                    if (IsEmoji(CurrentElement))
+                    if (IsEmoji(Elements[index-1]))
                     {
                         CLength += CurrentPaint.TextSize * 1.5F;
                     }
                     else
                     {
-                        CLength += CurrentPaint.MeasureText(CurrentElement);
+                        CLength += CurrentPaint.MeasureText(Elements[index - 1]);
                     }
-                    //Console.WriteLine(TempString);
                     if (CLength > Width)
                     {
                         if (TempString.Length > 0)
                         {
                             TempLine.Add(TempString);
                             TempString = "";
-                            //CurrentElement = Elements[index];
                         }
                         output.Add(TempLine);
                         TempLine = [];
@@ -215,7 +205,8 @@ namespace UndefinedBot.Net.Extra
                 }
                 if (TempString.Length > 0)
                 {
-                    output.Add([TempString]);
+                    TempLine.Add(TempString);
+                    output.Add(TempLine);
                 }
                 return output;
             }
