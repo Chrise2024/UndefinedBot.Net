@@ -34,15 +34,24 @@ namespace UndefinedBot.Net.Extra
         {
             int E1CP = GetEmojiUnicodePoint(Emoji1);
             int E2CP = GetEmojiUnicodePoint(Emoji2);
-            string TUrl = $"https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u{E1CP:X}/u{E1CP:X}_u{E2CP:X}.png".ToLower();
-            byte[] Res = HttpService.GetBinary(TUrl).Result;
+            string TUrlN = $"https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u{E1CP:X}/u{E1CP:X}_u{E2CP:X}.png".ToLower();
+            string TUrlR = $"https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u{E2CP:X}/u{E2CP:X}_u{E1CP:X}.png".ToLower();
+            byte[] Res = HttpRequest.GetBinary(TUrlN).Result;
             if (Res.Length == 0 || Res[0] != 0x89)
             {
-                return "";
+                Res = HttpRequest.GetBinary(TUrlR).Result;
+                if (Res.Length == 0 || Res[0] != 0x89)
+                {
+                    return "";
+                }
+                else
+                {
+                    return TUrlR;
+                }
             }
             else
             {
-                return TUrl;
+                return TUrlN;
             }
         }
     }
