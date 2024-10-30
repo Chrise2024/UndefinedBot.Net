@@ -49,102 +49,36 @@ namespace UndefinedBot.Net.Command
                     //ParamFormat: [MsgId] [Pattern] or [Pattern] [ImageUrl]
                     if (Args.Param.Count > 1)
                     {
-                        Image? Im = null;
-                        MemoryStream ms = new();
-                        string Pattern = "L";
+                        string ImageCachePath;
+                        //ParamFormat: [Pattern] [ImageUrl]
                         if (Args.Param[1].StartsWith("http"))
                         {
-                            //[Pattern] [ImageUrl]
-                            byte[] ImageBytes = await HttpRequest.GetBinary(Args.Param[1]);
-                            if (ImageBytes.Length > 0)
-                            {
-                                ms = new MemoryStream(ImageBytes);
-                                Im = Image.FromStream(ms);
-                            }
-                            Pattern = Args.Param[0];
+                            ImageCachePath = ImageConvert.GetConvertedImage(Args.Param[1],ImageContentType.Url, Args.Param[0]);
+                        }
+                        //ParamFormat: [MsgId] [Pattern]
+                        else
+                        {
+                            ImageCachePath = ImageConvert.GetConvertedImage(Args.Param[0], ImageContentType.MsgId, Args.Param[1]);
+                        }
+                        if (ImageCachePath.Length == 0)
+                        {
+                            ExecuteLogger.Error($"Pic Convert Failed, At Command <{Args.Command}>");
+                            await HttpApi.SendGroupMsg(
+                                Args.GroupId,
+                                new MsgBuilder()
+                                    .Text("似乎转换不了").Build()
+                            );
                         }
                         else
                         {
-                            //[MsgId] [Pattern]
-                            MsgBodySchematics TargetMsg = await HttpApi.GetMsg(Args.Param[0]);
-                            if ((TargetMsg.MessageId ?? 0) == 0)
-                            {
-                                ExecuteLogger.Error($"Invalid MsgId: {Args.Param[0]}, At Command <{Args.Command}>");
-                                await HttpApi.SendGroupMsg(
-                                        Args.GroupId,
-                                        new MsgBuilder()
-                                            .Text("无效的Msg").Build()
-                                    );
-                            }
-                            else
-                            {
-                                string PicUrl = CommandResolver.ExtractUrlFromMsg(TargetMsg);
-                                byte[] ImageBytes = await HttpRequest.GetBinary(PicUrl);
-                                if (ImageBytes.Length > 0)
-                                {
-                                    ms = new MemoryStream(ImageBytes);
-                                    Im = Image.FromStream(ms);
-                                }
-                                Pattern = Args.Param[1];
-                            }
-                        }
-                        if (Im != null)
-                        {
-                            if (Im.RawFormat.Equals(ImageFormat.Gif))
-                            {
-                                string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.gif");
-                                MagickImageCollection ResultImage = GifConvert.GifTransform(Im, Pattern);
-                                if (ResultImage.Count > 0)
-                                {
-                                    ResultImage.Write(ImCachePath);
-                                    await HttpApi.SendGroupMsg(
+                            await HttpApi.SendGroupMsg(
                                         Args.GroupId,
                                         new MsgBuilder()
                                             .Reply(Args.MsgId)
-                                            .Image(ImCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
+                                            .Image(ImageCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
                                     );
-                                    FileIO.SafeDeleteFile(ImCachePath);
-                                }
-                                else
-                                {
-                                    ExecuteLogger.Error($"Pic Convert Failed, At Command <{Args.Command}>");
-                                    await HttpApi.SendGroupMsg(
-                                        Args.GroupId,
-                                        new MsgBuilder()
-                                            .Text("转换失败").Build()
-                                    );
-                                }
-                                ResultImage.Dispose();
-                            }
-                            else
-                            {
-                                string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
-                                Bitmap ResultImage = PicConvert.PicTransform(new Bitmap(Im), Pattern);
-                                if (ResultImage != null)
-                                {
-                                    ResultImage.Save(ImCachePath, ImageFormat.Gif);
-                                    await HttpApi.SendGroupMsg(
-                                        Args.GroupId,
-                                        new MsgBuilder()
-                                            .Reply(Args.MsgId)
-                                            .Image(ImCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
-                                    );
-                                    FileIO.SafeDeleteFile(ImCachePath);
-                                }
-                                else
-                                {
-                                    ExecuteLogger.Error($"Pic Convert Failed, At Command <{Args.Command}>");
-                                    await HttpApi.SendGroupMsg(
-                                        Args.GroupId,
-                                        new MsgBuilder()
-                                            .Text("转换失败").Build()
-                                    );
-                                }
-                                ResultImage?.Dispose();
-                            }
-                            Im.Dispose();
+                            FileIO.SafeDeleteFile(ImageCachePath);
                         }
-                        ms.Close();
                     }
                     else
                     {
@@ -169,7 +103,7 @@ namespace UndefinedBot.Net.Command
                         await HttpApi.SendGroupMsg(
                                 Args.GroupId,
                                 new MsgBuilder()
-                                    .Text("获取失败").Build()
+                                    .Text("一言似乎迷路了").Build()
                             );
                     }
                 }
@@ -178,92 +112,24 @@ namespace UndefinedBot.Net.Command
                     //ParamFormat: [TargetMsg]
                     if (Args.Param.Count > 0)
                     {
-                        MsgBodySchematics TargetMsg = await HttpApi.GetMsg(Int32.TryParse(Args.Param[0], out int TargetMsgId) ? TargetMsgId : 0);
-                        if ((TargetMsg.MessageId ?? 0) == 0)
+                        string ImageCachePath = Queto.GenQuetoImage(Args.Param[0]);
+                        if (ImageCachePath.Length == 0)
                         {
-                            ExecuteLogger.Error($"Invalid MsgId: {Args.Param[0]}, At Command <{Args.Command}>");
+                            ExecuteLogger.Error($"Generate Failed, At Command <{Args.Command}>");
                             await HttpApi.SendGroupMsg(
-                                    Args.GroupId,
-                                    new MsgBuilder()
-                                        .Text("无效的Msg").Build()
-                                );
+                                Args.GroupId,
+                                new MsgBuilder()
+                                    .Text("生成出错了").Build()
+                            );
                         }
                         else
                         {
-                            string TargetMsgString = "";
-                            List<JObject> MsgSeq = TargetMsg.Message ?? [];
-                            foreach (JObject index in MsgSeq)
-                            {
-                                if (index.Value<string>("type")?.Equals("text") ?? false)
-                                {
-                                    string TText = index.Value<JObject>("data")?.Value<string>("text") ?? "";
-                                    if (TText.Length != 0 && !RegexProvider.GetEmptyStringRegex().IsMatch(TText))
-                                    {
-                                        TargetMsgString += TText;
-                                    }
-                                }
-                                else if (index.Value<string>("type")?.Equals("at") ?? false)
-                                {
-                                    TargetMsgString += (index.Value<JObject>("data")?.Value<string>("name") ?? "@") + " ";
-                                }
-                                else if (index.Value<string>("type")?.Equals("face") ?? false)
-                                {
-                                    string FId = index.Value<JObject>("data")?.Value<string>("id") ?? "";
-                                    TargetMsgString += (TextRender.QFaceReference.TryGetValue(FId,out var EmojiString) ? EmojiString : "");
-                                }
-                                else
-                                {
-                                    continue;
-                                }
-                            }
-                            long TargetUin = TargetMsg.Sender?.UserId ?? 0;
-                            GroupMemberSchematics CMember = await HttpApi.GetGroupMember(Args.GroupId, TargetUin);
-                            string TargetName = $"@{CMember.Nickname ?? ""}";
-                            string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
-                            string QSplashPath = Path.Join(Program.GetProgramLocal(), "QSplash.png");
-                            string QTextCachePath = Path.Join(Program.GetProgramCahce(), $"Text_{DateTime.Now:HH-mm-ss}.png");
-                            string QNNCachePath = Path.Join(Program.GetProgramCahce(), $"NickName_{DateTime.Now:HH-mm-ss}.png");
-                            if (File.Exists(QSplashPath))
-                            {
-                                Image CoverImage = Image.FromFile(QSplashPath);
-                                Image TargetAvatar = await HttpApi.GetQQAvatar(TargetUin);
-                                Bitmap bg = new(1200, 640);
-                                Graphics g = Graphics.FromImage(bg);
-                                g.DrawImage(TargetAvatar, 0, 0, 640, 640);
-                                g.DrawImage(CoverImage, 0, 0, 1200, 640);
-                                TextRender.GenTextImage(QTextCachePath, TargetMsgString, 96, 1800, 1350);
-                                TextRender.GenTextImage(QNNCachePath, TargetName, 72, 1500, 120);
-                                Bitmap TextBmp = new(QTextCachePath);
-                                Bitmap NameBmp = new(QNNCachePath);
-                                g.DrawImage(TextBmp, 550, 95, 600, 450);
-                                g.DrawImage(NameBmp, 600, 600, 500, 40);
-                                //g.DrawString(TargetMsgString, new Font("Noto Color Emoji", 40, FontStyle.Regular), new SolidBrush(Color.White), new RectangleF(440, 170, 800, 300), format);
-                                //g.DrawString(TargetName, new Font("Noto Color Emoji", 24, FontStyle.Regular), new SolidBrush(Color.White), new RectangleF(690, 540, 300, 80), format);
-                                bg.Save(ImCachePath, ImageFormat.Png);
-                                await HttpApi.SendGroupMsg(
+                            await HttpApi.SendGroupMsg(
                                     Args.GroupId,
                                     new MsgBuilder()
-                                        .Image(ImCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
+                                        .Image(ImageCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
                                 );
-                                TextBmp.Dispose();
-                                NameBmp.Dispose();
-                                g.Dispose();
-                                bg.Dispose();
-                                CoverImage.Dispose();
-                                TargetAvatar.Dispose();
-                                FileIO.SafeDeleteFile(ImCachePath);
-                                FileIO.SafeDeleteFile(QNNCachePath);
-                                FileIO.SafeDeleteFile(QTextCachePath);
-                            }
-                            else
-                            {
-                                ExecuteLogger.Error($"Generate Failed, At Command <{Args.Command}>");
-                                await HttpApi.SendGroupMsg(
-                                    Args.GroupId,
-                                    new MsgBuilder()
-                                        .Text("生成失败").Build()
-                                );
-                            }
+                            FileIO.SafeDeleteFile(ImageCachePath);
                         }
                     }
                     else
@@ -271,6 +137,7 @@ namespace UndefinedBot.Net.Command
                         ExecuteLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
                     }
                 }
+                /*
                 else if (Args.Command.Equals("invert"))
                 {
                     //ParamFormat: [MsgId] or [ImageUrl]
@@ -296,7 +163,7 @@ namespace UndefinedBot.Net.Command
                                 await HttpApi.SendGroupMsg(
                                         Args.GroupId,
                                         new MsgBuilder()
-                                            .Text("无效的Msg").Build()
+                                            .Text("定位不到图片").Build()
                                     );
                             }
                             else
@@ -329,6 +196,7 @@ namespace UndefinedBot.Net.Command
                         ExecuteLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
                     }
                 }
+                */
                 else if (Args.Command.Equals("raw"))
                 {
                     //ParamFormat: Any
@@ -348,10 +216,10 @@ namespace UndefinedBot.Net.Command
                 }
                 else if (Args.Command.Equals("mix"))
                 {
-                    //ParamFormat: [Emoji1] [Emoji2]
-                    if (Args.Param.Count > 1)
+                    //ParamFormat: [Emoji1] [Emoji2] or [Emoji1Emoji2]
+                    if (Args.Param.Count > 0)
                     {
-                        string MixRes = EmojiMix.MixEmoji(Args.Param[0], Args.Param[1]);
+                        string MixRes = EmojiMix.MixEmoji(Args.Param);
                         if (MixRes.Length > 0)
                         {
                             await HttpApi.SendGroupMsg(
@@ -366,7 +234,7 @@ namespace UndefinedBot.Net.Command
                             await HttpApi.SendGroupMsg(
                                     Args.GroupId,
                                     new MsgBuilder()
-                                        .Text("生成失败").Build()
+                                        .Text("似乎不能混合").Build()
                                 );
                         }
                     }
@@ -386,7 +254,6 @@ namespace UndefinedBot.Net.Command
                             await HttpApi.SendGroupMsg(
                                             Args.GroupId,
                                             new MsgBuilder()
-                                                //.Reply(Args.MsgId)
                                                 .Image(OutUrl, ImageSendType.Url).Build()
                                         );
                         }
@@ -395,7 +262,7 @@ namespace UndefinedBot.Net.Command
                             await HttpApi.SendGroupMsg(
                                     Args.GroupId,
                                     new MsgBuilder()
-                                        .Text("获取失败").Build()
+                                        .Text("呃啊，图片迷路了").Build()
                                 );
                         }
                     }
@@ -403,6 +270,49 @@ namespace UndefinedBot.Net.Command
                     {
                         ExecuteLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
                     }
+                }
+                else if (Args.Command.Equals("homo"))
+                {
+                    //ParamFormat: [Text]
+                    if (Args.Param.Count > 0)
+                    {
+                        string Res = Homo.Homoize(Args.Param[0],out bool Status);
+                        if (Status)
+                        {
+
+                            await HttpApi.SendGroupMsg(
+                                                Args.GroupId,
+                                                new MsgBuilder()
+                                                    //.Reply(Args.MsgId)
+                                                    .Text($"{Args.Param[0]} = {Res}").Build()
+                                            );
+                        }
+                        else
+                        {
+                            await HttpApi.SendGroupMsg(
+                                                Args.GroupId,
+                                                new MsgBuilder()
+                                                    //.Reply(Args.MsgId)
+                                                    .Text($"{Res}").Build()
+                                            );
+                        }
+                    }
+                    else
+                    {
+                        ExecuteLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
+                    }
+                }
+                else if (Args.Command.Equals("histoday"))
+                {
+                    //ParamFormat: Any
+                    string ImageCachePath = Histoday.GenHistodayImage();
+                    await HttpApi.SendGroupMsg(
+                                    Args.GroupId,
+                                    new MsgBuilder()
+                                        .Image(ImageCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
+                                );
+                    FileIO.SafeDeleteFile(ImageCachePath);
+
                 }
                 ExecuteLogger.Info("Execute Finished");
             }
@@ -412,7 +322,7 @@ namespace UndefinedBot.Net.Command
                 await HttpApi.SendGroupMsg(
                                 Args.GroupId,
                                 new MsgBuilder()
-                                    .Text($"未知指令: <{Args.Command}>").Build()
+                                    .Text($"这发的什么东西: <{Args.Command}>").Build()
                             );
             }
         }

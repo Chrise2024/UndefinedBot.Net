@@ -13,10 +13,12 @@ namespace UndefinedBot.Net.Utils
             "symmet",
             "hito",
             "queto",
-            "invert",
+            //"invert",
             "raw",
             "mix",
             "random",
+            "homo",
+            "histoday",
         ];
         private readonly JSchema ConfigJsonSchema = JSchema.Parse(
             @"

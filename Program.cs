@@ -11,6 +11,7 @@ using UndefinedBot.Net.Extra;
 using UndefinedBot.Net.NetWork;
 using UndefinedBot.Net.Utils;
 using ImageMagick;
+using System.Globalization;
 
 namespace UndefinedBot.Net
 {

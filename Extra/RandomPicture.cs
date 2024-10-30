@@ -114,7 +114,7 @@ namespace UndefinedBot.Net.Extra
         {
             try
             {
-                if (RandomRoot.Next(1, 100) > 50)
+                if (RandomRoot.Next(1, 100) > 75)
                 {
                     return HttpRequest.Get("https://www.loliapi.com/bg/?type=url").Result.Replace(".cn", ".com");
                 }

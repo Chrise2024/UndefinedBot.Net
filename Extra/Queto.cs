@@ -1,11 +1,92 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Drawing;
+using System.Drawing.Imaging;
 using SkiaSharp;
+using Newtonsoft.Json.Linq;
+using UndefinedBot.Net.NetWork;
+using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Extra
 {
+    internal class Queto
+    {
+        public static string GenQuetoImage(string TargetMsgIdString)
+        {
+            MsgBodySchematics TargetMsg = HttpApi.GetMsg(Int32.TryParse(TargetMsgIdString, out int TargetMsgId) ? TargetMsgId : 0).Result;
+            if ((TargetMsg.MessageId ?? 0) == 0)
+            {
+                return "";
+            }
+            else
+            {
+                string TargetMsgString = "";
+                List<JObject> MsgSeq = TargetMsg.Message ?? [];
+                foreach (JObject index in MsgSeq)
+                {
+                    if (index.Value<string>("type")?.Equals("text") ?? false)
+                    {
+                        string TText = index.Value<JObject>("data")?.Value<string>("text") ?? "";
+                        if (TText.Length != 0 && !RegexProvider.GetEmptyStringRegex().IsMatch(TText))
+                        {
+                            TargetMsgString += TText;
+                        }
+                    }
+                    else if (index.Value<string>("type")?.Equals("at") ?? false)
+                    {
+                        TargetMsgString += (index.Value<JObject>("data")?.Value<string>("name") ?? "@") + " ";
+                    }
+                    else if (index.Value<string>("type")?.Equals("face") ?? false)
+                    {
+                        string FId = index.Value<JObject>("data")?.Value<string>("id") ?? "";
+                        TargetMsgString += (TextRender.QFaceReference.TryGetValue(FId, out var EmojiString) ? EmojiString : "");
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                long TargetUin = TargetMsg.Sender?.UserId ?? 0;
+                GroupMemberSchematics CMember = HttpApi.GetGroupMember(TargetMsg.GroupId ?? 0, TargetUin).Result;
+                string TargetName = $"@{CMember.Nickname ?? ""}";
+                string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
+                string QSplashPath = Path.Join(Program.GetProgramLocal(), "QSplash.png");
+                string QTextCachePath = Path.Join(Program.GetProgramCahce(), $"Text_{DateTime.Now:HH-mm-ss}.png");
+                string QNNCachePath = Path.Join(Program.GetProgramCahce(), $"NickName_{DateTime.Now:HH-mm-ss}.png");
+                if (File.Exists(QSplashPath))
+                {
+                    Image CoverImage = Image.FromFile(QSplashPath);
+                    Image TargetAvatar = HttpApi.GetQQAvatar(TargetUin).Result;
+                    Bitmap bg = new(1200, 640);
+                    Graphics g = Graphics.FromImage(bg);
+                    g.DrawImage(TargetAvatar, 0, 0, 640, 640);
+                    g.DrawImage(CoverImage, 0, 0, 1200, 640);
+                    TextRender.GenTextImage(QTextCachePath, TargetMsgString, 96, 1800, 1350);
+                    TextRender.GenTextImage(QNNCachePath, TargetName, 72, 1500, 120);
+                    Bitmap TextBmp = new(QTextCachePath);
+                    Bitmap NameBmp = new(QNNCachePath);
+                    g.DrawImage(TextBmp, 550, 95, 600, 450);
+                    g.DrawImage(NameBmp, 600, 600, 500, 40);
+                    //g.DrawString(TargetMsgString, new Font("Noto Color Emoji", 40, FontStyle.Regular), new SolidBrush(Color.White), new RectangleF(440, 170, 800, 300), format);
+                    //g.DrawString(TargetName, new Font("Noto Color Emoji", 24, FontStyle.Regular), new SolidBrush(Color.White), new RectangleF(690, 540, 300, 80), format);
+                    bg.Save(ImCachePath, ImageFormat.Png);
+                    TextBmp.Dispose();
+                    NameBmp.Dispose();
+                    g.Dispose();
+                    bg.Dispose();
+                    CoverImage.Dispose();
+                    TargetAvatar.Dispose();
+                    FileIO.SafeDeleteFile(QNNCachePath);
+                    FileIO.SafeDeleteFile(QTextCachePath);
+                    return ImCachePath;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+    }
     internal class TextRender
     {
         public static readonly Dictionary<string, string> QFaceReference = new()
@@ -96,7 +177,7 @@ namespace UndefinedBot.Net.Extra
             Canvas.Dispose();
             Surface.Dispose();
         }
-        private static void DrawTextWithWrapping(SKCanvas canvas, string text, SKRect TextArea,int FontSize)
+        private static void DrawTextWithWrapping(SKCanvas canvas, string text, SKRect TextArea, int FontSize)
         {
             SKPaint PaintEmoji = new SKPaint
             {
@@ -119,9 +200,9 @@ namespace UndefinedBot.Net.Extra
                 IsLinearText = true,
             };
             SKPoint DrawPosition = new(TextArea.Width / 2, FontSize);
-            List<List<string>> Lines = SplitString(text,FontSize,TextArea.Width - FontSize * 1.5F, PaintText);
+            List<List<string>> Lines = SplitString(text, FontSize, TextArea.Width - FontSize * 1.5F, PaintText);
             float yOffset = (TextArea.Height / 2) - (Lines.Count * FontSize / 2);
-            for (int i = 0;i < Lines.Count; i++)
+            for (int i = 0; i < Lines.Count; i++)
             {
                 DrawLine(canvas, Lines[i], new SKPoint(DrawPosition.X, DrawPosition.Y + yOffset), PaintEmoji, PaintText);
                 yOffset += FontSize;
@@ -133,7 +214,7 @@ namespace UndefinedBot.Net.Extra
             PaintEmoji.Dispose();
             PaintText.Dispose();
         }
-        private static void DrawLine(SKCanvas canvas, List<string> LineText,SKPoint LinePosition, SKPaint PaintEmoji, SKPaint PaintText)
+        private static void DrawLine(SKCanvas canvas, List<string> LineText, SKPoint LinePosition, SKPaint PaintEmoji, SKPaint PaintText)
         {
             float FontSize = PaintText.TextSize;
             float LineWidth = 0;
@@ -156,7 +237,7 @@ namespace UndefinedBot.Net.Extra
                 }
             }
         }
-        private static List<List<string>> SplitString(string input, int FontSize,float Width, SKPaint CurrentPaint)
+        private static List<List<string>> SplitString(string input, int FontSize, float Width, SKPaint CurrentPaint)
         {
             Width -= FontSize;
             List<List<string>> output = [];
@@ -183,7 +264,7 @@ namespace UndefinedBot.Net.Extra
                         TempLine.Add(TempString);
                         TempString = Elements[index];
                     }
-                    if (IsEmoji(Elements[index-1]))
+                    if (IsEmoji(Elements[index - 1]))
                     {
                         CLength += CurrentPaint.TextSize * 1.5F;
                     }
@@ -219,7 +300,7 @@ namespace UndefinedBot.Net.Extra
         {
             UnicodeCategory UC = CharUnicodeInfo.GetUnicodeCategory(TextElement.Length > 0 ? TextElement[0] : ' ');
             return UC == UnicodeCategory.OtherSymbol || UC == UnicodeCategory.ModifierSymbol ||
-                   UC == UnicodeCategory.PrivateUse  || UC == UnicodeCategory.Surrogate;
+                   UC == UnicodeCategory.PrivateUse || UC == UnicodeCategory.Surrogate;
         }
         private static bool IsASCII(char IC)
         {

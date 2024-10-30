@@ -33,5 +33,11 @@ namespace UndefinedBot.Net.Utils
 
         [GeneratedRegex(@"^\s+$")]
         public static partial Regex GetEmptyStringRegex();
+
+        [GeneratedRegex(@"\*\(1\)|\+\(0\)$")]
+        public static partial Regex GetEmptyMultipleEmelment();
+
+        [GeneratedRegex(@"([\*|\/])\(([^\+\-\(\)]+)\)$")]
+        public static partial Regex GetMultipleNumberEmelment();
     }
 }

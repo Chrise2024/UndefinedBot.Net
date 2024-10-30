@@ -4,10 +4,90 @@ using System.Drawing.Imaging;
 using SkiaSharp;
 using ImageMagick;
 using ImageMagick.Drawing;
-using Newtonsoft.Json.Linq;
+using UndefinedBot.Net.NetWork;
+using UndefinedBot.Net.Utils;
+using UndefinedBot.Net.Command;
 
 namespace UndefinedBot.Net.Extra
 {
+    public enum ImageContentType
+    {
+        Url = 0,
+        MsgId = 1,
+    }
+    public class ImageConvert
+    {
+        public static string GetConvertedImage(string ImageContent, ImageContentType ContentType, string ConvertMethod = "L")
+        {
+            Image? Im;
+            MemoryStream? ms;
+            if (ContentType == ImageContentType.Url)
+            {
+                byte[] ImageBytes = HttpRequest.GetBinary(ImageContent).Result;
+                ms = new MemoryStream(ImageBytes);
+                Im = Image.FromStream(ms);
+            }
+            else
+            {
+                MsgBodySchematics TargetMsg = HttpApi.GetMsg(ImageContent).Result;
+                if ((TargetMsg.MessageId ?? 0) == 0)
+                {
+                    return "";
+                }
+                else
+                {
+                    byte[] ImageBytes = HttpRequest.GetBinary(CommandResolver.ExtractUrlFromMsg(TargetMsg)).Result;
+                    ms = new MemoryStream(ImageBytes);
+                    Im = Image.FromStream(ms);
+                }
+            }
+            if (Im != null)
+            {
+                if (Im.RawFormat.Equals(ImageFormat.Gif))
+                {
+                    string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.gif");
+                    MagickImageCollection ResultImage = GifConvert.GifTransform(Im, ConvertMethod);
+                    if (ResultImage.Count > 0)
+                    {
+                        ResultImage.Write(ImCachePath);
+                        ResultImage.Dispose();
+                        Im.Dispose();
+                        ms.Close();
+                        return ImCachePath;
+                    }
+                    else
+                    {
+                        Im.Dispose();
+                        ms.Close();
+                        return "";
+                    }
+                }
+                else
+                {
+                    string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
+                    Bitmap ResultImage = PicConvert.PicTransform(new Bitmap(Im), ConvertMethod);
+                    if (ResultImage != null)
+                    {
+                        ResultImage.Save(ImCachePath, ImageFormat.Gif);
+                        ResultImage.Dispose();
+                        Im.Dispose();
+                        ms.Close();
+                        return ImCachePath;
+                    }
+                    else
+                    {
+                        Im.Dispose();
+                        ms.Close();
+                        return "";
+                    }
+                }
+            }
+            else
+            {
+                return "";
+            }
+        }
+    }
     public class ImageSymmetry
     {
         public static Bitmap SymmetryL(Bitmap bmp)
