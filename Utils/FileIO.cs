@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace UndefinedBot.Net.Utils
 {
-    internal abstract class FileIO
+    public abstract class FileIO
     {
         public static void EnsurePath(string? tPath)
         {

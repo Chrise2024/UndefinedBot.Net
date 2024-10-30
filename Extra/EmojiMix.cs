@@ -6,7 +6,7 @@ using UndefinedBot.Net.NetWork;
 
 namespace UndefinedBot.Net.Extra
 {
-    internal class EmojiMix
+    public class EmojiMix
     {
         public static int GetEmojiUnicodePoint(string EmojiString)
         {

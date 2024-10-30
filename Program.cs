@@ -15,7 +15,7 @@ using System.Globalization;
 
 namespace UndefinedBot.Net
 {
-    internal class Program
+    public class Program
     {
         private static readonly string ProgramRoot = Environment.CurrentDirectory;
 
@@ -30,14 +30,29 @@ namespace UndefinedBot.Net
         private static readonly Logger MainLogger = new("Program");
 
         private static readonly Assembly MainAssembly = Assembly.GetExecutingAssembly();
-
+        //Name -> Description
+        private static readonly Dictionary<string, string> CommandReference = [];
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
-            MainLogger.Info("Bot Launched");
             FileIO.EnsurePath(ProgramCahce);
             FileIO.EnsurePath(ProgramLocal);
+            //Activate Commands
+            IEnumerable<Type> types = MainAssembly.GetTypes().Where(t => t.Namespace == "UndefinedBot.Net.Command.Content" && t.IsClass);
+            foreach (Type type in types)
+            {
+                var instance = Activator.CreateInstance(type);
+                MethodInfo? method = type.GetMethod("Init");
+                PropertyInfo? NameInfo = type.GetProperty("CommandName");
+                PropertyInfo? DescriptionInfo = type.GetProperty("CommandDescription");
+                if (NameInfo?.GetValue(instance) is string CName && DescriptionInfo?.GetValue(instance) is string CDescription)
+                {
+                    method?.Invoke(instance, null);
+                    CommandReference.Add(CName, CDescription);
+                }
+            }
+            MsgHandler.UpdateCL([.. CommandReference.Keys]);
             if (!File.Exists(Path.Join(ProgramLocal, "QSplash.png")))
             {
                 Stream? stream = MainAssembly.GetManifestResourceStream("UndefinedBot.Net.Local.QSplash.png");
@@ -49,6 +64,7 @@ namespace UndefinedBot.Net
                 }
                 stream?.Close();
             }
+            MainLogger.Info("Bot Launched");
             Task.Run(HServer.Start);
             string TempString;
             while (true)
@@ -78,6 +94,10 @@ namespace UndefinedBot.Net
         public static ConfigManager GetConfigManager()
         {
             return MainConfigManager;
+        }
+        public static Dictionary<string,string> GetCommandReference()
+        {
+            return CommandReference;
         }
     }
 }

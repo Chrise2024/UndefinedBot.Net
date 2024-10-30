@@ -19,7 +19,7 @@ namespace UndefinedBot.Net.Utils
         Hot = 2,     //热图
         Battel = 3,  //斗图
     }
-    internal class MsgBuilder
+    public class MsgBuilder
     {
 
         private readonly List<JObject> MsgChain = [];

@@ -97,7 +97,7 @@ namespace UndefinedBot.Net.Utils
         [JsonProperty("font")] public int? Font;
         [JsonProperty("sender")] public MsgSenderSchematics? Sender;
     }
-    internal class Schematics
+    public class Schematics
     {
     }
 }

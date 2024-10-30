@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace UndefinedBot.Net.Utils
 {
-    internal partial class RegexProvider
+    public partial class RegexProvider
     {
         /*
         private static readonly string CommandPrefix = Program.GetConfigManager().GetCommandPrefix();

@@ -6,7 +6,7 @@ using UndefinedBot.Net.NetWork;
 
 namespace UndefinedBot.Net.Extra
 {
-    internal class RandomPicture
+    public class RandomPicture
     {
         private static readonly Random RandomRoot = new();
 

@@ -2,7 +2,7 @@
 
 namespace UndefinedBot.Net.Utils
 {
-    internal class Logger(string NameSpace,string Work = "Common")
+    public class Logger(string NameSpace,string Work = "Common")
     {
         private readonly string NameSpace = NameSpace;
 

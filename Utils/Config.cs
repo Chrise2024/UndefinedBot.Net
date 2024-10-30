@@ -6,7 +6,7 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Utils
 {
-    internal class ConfigManager
+    public class ConfigManager
     {
         private readonly List<string> DefaultCommands = [
             "help",

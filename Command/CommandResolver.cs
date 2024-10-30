@@ -9,7 +9,7 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Command
 {
-    internal class CommandResolver
+    public class CommandResolver
     {
         private static readonly ArgSchematics InvalidCommandArg = new("null", [], 0,  0, 0, false);
 
@@ -22,7 +22,7 @@ namespace UndefinedBot.Net.Command
         private static readonly Logger ArgLogger = new("CommandResolver", "ArgParse");
 
         private static readonly Logger HandleLogger = new("CommandResolver", "HandleMsg");
-        private static ArgSchematics Parse(MsgBodySchematics MsgBody)
+        public static ArgSchematics Parse(MsgBodySchematics MsgBody)
         {
             long GroupId = MsgBody.GroupId ?? 0;
             long CallerUin = MsgBody.UserId ?? 0;
@@ -50,6 +50,7 @@ namespace UndefinedBot.Net.Command
                     if ( NormalCQString.StartsWith(CommandPrefix))
                     {
                         List<string> Params = ParseCQString(NormalCQString[CommandPrefix.Length..]);
+                        ArgLogger.Info("Parse Complete");
                         return new ArgSchematics(
                             Params[0],
                             [$"{TargetMsgId}", ..Params[1..]],
@@ -63,6 +64,7 @@ namespace UndefinedBot.Net.Command
                 else if (CQString.StartsWith(CommandPrefix) && !CQString.Equals(CommandPrefix))
                 {
                     List<string> Params = ParseCQString(CQString[CommandPrefix.Length..]);
+                    ArgLogger.Info("Parse Complete");
                     return new ArgSchematics(
                             Params[0],
                             Params[1..],
@@ -72,6 +74,7 @@ namespace UndefinedBot.Net.Command
                             true
                             );
                 }
+                ArgLogger.Info("Parse Complete");
             }
             return NoneCommandArg;
         }
@@ -120,7 +123,7 @@ namespace UndefinedBot.Net.Command
                             }
                         }
                         return " ";
-                    }//$" {RegexProvider.GetIdRegex().Match(match.Value).Value} "
+                    }
                 ).Split(" ", StringSplitOptions.RemoveEmptyEntries)
             );
         }
@@ -172,28 +175,11 @@ namespace UndefinedBot.Net.Command
                                     return DataObj.Value<string>("file") ?? "";
                                 }
                             }
-                            //return JT.ToObject<JObject>()?.Value<string>("file") ?? "";
-                            //return JT.ToObject<JObject>()?.Value<string>("url") ?? ( JT.ToObject<JObject>()?.Value<string>("file") ?? "");
                         }
                     }
                 }
             }
             return "";
-        }
-        public static async Task HandleMsg(MsgBodySchematics MsgBody)
-        {
-            if ((MsgBody.PostType?.Equals("message") ?? false) &&
-                (MsgBody.MessageType?.Equals("group") ?? false) &&
-                WorkGRoup.Contains(MsgBody.GroupId ?? 0)
-                )
-            {
-                ArgSchematics Args = Parse(MsgBody);
-                ArgLogger.Info("Parse Complete");
-                if (Args.Status)
-                {
-                    CommandExecutor.Execute(Args);
-                }
-            }
         }
     }
 }

@@ -10,7 +10,7 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.NetWork
 {
-    internal class HttpApi
+    public class HttpApi
     {
         private static readonly string HttpPostUrl = Program.GetConfigManager().GetHttpPostUrl();
 
@@ -96,8 +96,6 @@ namespace UndefinedBot.Net.NetWork
                        "application/json"
                    )
                 );
-                //Console.WriteLine("GetMsg<T>");
-                Console.WriteLine(response.Content.ReadAsStringAsync().Result);
                 return JObject.Parse(response.Content.ReadAsStringAsync().Result)["data"]?.ToObject<MsgBodySchematics>() ?? new MsgBodySchematics();
             }
             catch (TaskCanceledException ex)
@@ -204,7 +202,7 @@ namespace UndefinedBot.Net.NetWork
             return ((await GetGroupMember(TargetGroupId, TargetUin)).GroupId ?? 0) != 0;
         }
     }
-    internal class HttpRequest
+    public class HttpRequest
     {
         private static readonly HttpClient HClient = new()
         {

@@ -9,7 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Command\Content\TemplateCommand.txt" />
     <None Remove="Local\QSplash.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="TemplateCommand.txt" />
   </ItemGroup>
 
   <ItemGroup>

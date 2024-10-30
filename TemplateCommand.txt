@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UndefinedBot.Net.Command;
+using UndefinedBot.Net.NetWork;
+using UndefinedBot.Net.Utils;
+
+namespace UndefinedBot.Net
+{
+    public class TemplateCommand : IBaseCommand
+    {
+        public string CommandName { get; } = "";
+        public string CommandDescription { get; } = "";
+
+        private readonly Logger CommandLogger = new("Command", "");
+        public async Task Handle(ArgSchematics Args)
+        {
+            if (Args.Command.Equals(CommandName))
+            {
+                CommandLogger.Info("Command Triggered");
+                CommandLogger.Info("Command Completed");
+            }
+        }
+        public void Init()
+        {
+            MsgHandler.GetCommandHandler().CommandEvent += Handle;
+            CommandLogger.Info("Loaded");
+        }
+    }
+}

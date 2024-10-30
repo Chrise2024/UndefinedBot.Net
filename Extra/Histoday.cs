@@ -6,7 +6,7 @@ using UndefinedBot.Net.NetWork;
 
 namespace UndefinedBot.Net.Extra
 {
-    internal class Histoday
+    public class Histoday
     {
         private static readonly CultureInfo ZhCNInfo = new("zh-CN");
 

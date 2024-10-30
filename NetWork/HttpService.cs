@@ -56,7 +56,7 @@ namespace UndefinedBot.Net.NetWork
                 sr.Close();
                 context.Response.StatusCode = 200;
                 context.Response.Close();
-                await CommandResolver.HandleMsg(JsonConvert.DeserializeObject<MsgBodySchematics>(ReqString.Replace("-:/&]","\\")));
+                await MsgHandler.HandleMsg(JsonConvert.DeserializeObject<MsgBodySchematics>(ReqString.Replace("-:/&]", "\\")));
             }
             catch (Exception ex)
             {

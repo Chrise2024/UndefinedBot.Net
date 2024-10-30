@@ -9,7 +9,7 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Extra
 {
-    internal class Queto
+    public class Queto
     {
         public static string GenQuetoImage(string TargetMsgIdString)
         {
@@ -87,7 +87,7 @@ namespace UndefinedBot.Net.Extra
             }
         }
     }
-    internal class TextRender
+    public class TextRender
     {
         public static readonly Dictionary<string, string> QFaceReference = new()
         {

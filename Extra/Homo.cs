@@ -4,7 +4,7 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Extra
 {
-    internal class Homo
+    public class Homo
     {
         public static string Homoize(string Input,out bool Status)
         {
