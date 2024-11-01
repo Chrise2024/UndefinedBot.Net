@@ -8,12 +8,12 @@ namespace UndefinedBot.Net.Extra
 {
     public class AnswerBook
     {
-        private static readonly Random RandomRoot = new();
+        private static readonly Random s_randomRoot = new();
         public static string GetAnswer()
         {
-            return AnswerList[RandomRoot.Next(AnswerList.Count)];
+            return s_answerList[s_randomRoot.Next(s_answerList.Count)];
         }
-        private static readonly List<string> AnswerList = [
+        private static readonly List<string> s_answerList = [
             "找个人给你意见",
             "算了吧",
             "请教你的妈妈",

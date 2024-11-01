@@ -17,19 +17,19 @@ namespace UndefinedBot.Net.Extra
     }
     public class ImageConvert
     {
-        public static string GetConvertedImage(string ImageContent, ImageContentType ContentType, string ConvertMethod = "L")
+        public static string GetConvertedImage(string imageContent, ImageContentType contentType, string convertMethod = "L")
         {
             Image? Im;
-            MemoryStream? ms;
-            if (ContentType == ImageContentType.Url)
+            MemoryStream? Ms;
+            if (contentType == ImageContentType.Url)
             {
-                byte[] ImageBytes = HttpRequest.GetBinary(ImageContent).Result;
-                ms = new MemoryStream(ImageBytes);
-                Im = Image.FromStream(ms);
+                byte[] ImageBytes = HttpRequest.GetBinary(imageContent).Result;
+                Ms = new MemoryStream(ImageBytes);
+                Im = Image.FromStream(Ms);
             }
             else
             {
-                MsgBodySchematics TargetMsg = HttpApi.GetMsg(ImageContent).Result;
+                MsgBodySchematics TargetMsg = HttpApi.GetMsg(imageContent).Result;
                 if ((TargetMsg.MessageId ?? 0) == 0)
                 {
                     return "";
@@ -37,8 +37,8 @@ namespace UndefinedBot.Net.Extra
                 else
                 {
                     byte[] ImageBytes = HttpRequest.GetBinary(CommandResolver.ExtractUrlFromMsg(TargetMsg)).Result;
-                    ms = new MemoryStream(ImageBytes);
-                    Im = Image.FromStream(ms);
+                    Ms = new MemoryStream(ImageBytes);
+                    Im = Image.FromStream(Ms);
                 }
             }
             if (Im != null)
@@ -46,38 +46,38 @@ namespace UndefinedBot.Net.Extra
                 if (Im.RawFormat.Equals(ImageFormat.Gif))
                 {
                     string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.gif");
-                    MagickImageCollection ResultImage = GifConvert.GifTransform(Im, ConvertMethod);
+                    MagickImageCollection ResultImage = GifConvert.GifTransform(Im, convertMethod);
                     if (ResultImage.Count > 0)
                     {
                         ResultImage.Write(ImCachePath);
                         ResultImage.Dispose();
                         Im.Dispose();
-                        ms.Close();
+                        Ms.Close();
                         return ImCachePath;
                     }
                     else
                     {
                         Im.Dispose();
-                        ms.Close();
+                        Ms.Close();
                         return "";
                     }
                 }
                 else
                 {
                     string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
-                    Bitmap ResultImage = PicConvert.PicTransform(new Bitmap(Im), ConvertMethod);
+                    Bitmap ResultImage = PicConvert.PicTransform(new Bitmap(Im), convertMethod);
                     if (ResultImage != null)
                     {
                         ResultImage.Save(ImCachePath, ImageFormat.Gif);
                         ResultImage.Dispose();
                         Im.Dispose();
-                        ms.Close();
+                        Ms.Close();
                         return ImCachePath;
                     }
                     else
                     {
                         Im.Dispose();
-                        ms.Close();
+                        Ms.Close();
                         return "";
                     }
                 }
@@ -226,38 +226,38 @@ namespace UndefinedBot.Net.Extra
 
     public class PicConvert
     {
-        public static Bitmap PicTransform(Bitmap PicImage, string Method)
+        public static Bitmap PicTransform(Bitmap picImage, string method)
         {
             var TransformMethod = ImageSymmetry.SymmetryL;
-            if (Method.Equals("右左"))
+            if (method.Equals("右左"))
             {
                 TransformMethod = ImageSymmetry.SymmetryR;
             }
-            else if (Method.Equals("上下"))
+            else if (method.Equals("上下"))
             {
                 TransformMethod = ImageSymmetry.SymmetryU;
             }
-            else if (Method.Equals("下上"))
+            else if (method.Equals("下上"))
             {
                 TransformMethod = ImageSymmetry.SymmetryD;
             }
-            else if (Method.Equals("左上"))
+            else if (method.Equals("左上"))
             {
                 TransformMethod = ImageSymmetry.SymmetryLU;
             }
-            else if (Method.Equals("左下"))
+            else if (method.Equals("左下"))
             {
                 TransformMethod = ImageSymmetry.SymmetryLD;
             }
-            else if (Method.Equals("右上"))
+            else if (method.Equals("右上"))
             {
                 TransformMethod = ImageSymmetry.SymmetryRU;
             }
-            else if (Method.Equals("右下"))
+            else if (method.Equals("右下"))
             {
                 TransformMethod = ImageSymmetry.SymmetryRD;
             }
-            return TransformMethod(PicImage);
+            return TransformMethod(picImage);
         }
     }
 
@@ -277,46 +277,46 @@ namespace UndefinedBot.Net.Extra
                 return 0;
             }
         }
-        public static MagickImageCollection GifTransform(Image GifImage, string Method)
+        public static MagickImageCollection GifTransform(Image gifImage, string method)
         {
             var TransformMethod = ImageSymmetry.SymmetryL;
-            if (Method.Equals("右左"))
+            if (method.Equals("右左"))
             {
                 TransformMethod = ImageSymmetry.SymmetryR;
             }
-            else if (Method.Equals("上下"))
+            else if (method.Equals("上下"))
             {
                 TransformMethod = ImageSymmetry.SymmetryU;
             }
-            else if (Method.Equals("下上"))
+            else if (method.Equals("下上"))
             {
                 TransformMethod = ImageSymmetry.SymmetryD;
             }
-            else if (Method.Equals("左上"))
+            else if (method.Equals("左上"))
             {
                 TransformMethod = ImageSymmetry.SymmetryLU;
             }
-            else if (Method.Equals("左下"))
+            else if (method.Equals("左下"))
             {
                 TransformMethod = ImageSymmetry.SymmetryLD;
             }
-            else if (Method.Equals("右上"))
+            else if (method.Equals("右上"))
             {
                 TransformMethod = ImageSymmetry.SymmetryRU;
             }
-            else if (Method.Equals("右下"))
+            else if (method.Equals("右下"))
             {
                 TransformMethod = ImageSymmetry.SymmetryRD;
             }
 
-            FrameDimension Dimension = new(GifImage.FrameDimensionsList[0]);
-            int FrameCount = GifImage.GetFrameCount(Dimension);
-            uint Delay = GetGifFrameDelay(GifImage);
+            FrameDimension Dimension = new(gifImage.FrameDimensionsList[0]);
+            int FrameCount = gifImage.GetFrameCount(Dimension);
+            uint Delay = GetGifFrameDelay(gifImage);
             var Ncollection = new MagickImageCollection();
             for (int i = 0; i < FrameCount; i++)
             {
-                GifImage.SelectActiveFrame(Dimension, i);
-                Bitmap frame = new(GifImage);
+                gifImage.SelectActiveFrame(Dimension, i);
+                Bitmap frame = new(gifImage);
                 MemoryStream FMemoryStream = new();
                 TransformMethod(frame).Save(FMemoryStream, ImageFormat.Bmp);
                 FMemoryStream.Position = 0;
@@ -330,7 +330,7 @@ namespace UndefinedBot.Net.Extra
                 frame.Dispose();
             }
             Ncollection[0].AnimationIterations = 0;
-            GifImage.Dispose();
+            gifImage.Dispose();
             return Ncollection;
         }
     }

@@ -22,76 +22,76 @@ namespace UndefinedBot.Net.Utils
     public class MsgBuilder
     {
 
-        private readonly List<JObject> MsgChain = [];
+        private readonly List<JObject> _msgChain = [];
 
-        public MsgBuilder Text(string Text)
+        public MsgBuilder Text(string text)
         {
-            MsgChain.Add(new JObject()
+            _msgChain.Add(new JObject()
             {
                 { "type" , "text" },
                 { "data" ,  new JObject(){
-                    { "text" , Text }
+                    { "text" , text }
                 } },
             });
             return this;
         }
-        public MsgBuilder QFace(string Face)
+        public MsgBuilder QFace(string face)
         {
-            MsgChain.Add(new JObject()
+            _msgChain.Add(new JObject()
             {
                 { "type" , "text" },
                 { "data" ,  new JObject(){
-                    { "id" , Face }
+                    { "id" , face }
                 } },
             });
             return this;
         }
-        public MsgBuilder Image(string ImageContent, ImageSendType SendType = ImageSendType.LocalFile,ImageSubType Subtype = ImageSubType.Normal)
+        public MsgBuilder Image(string imageContent, ImageSendType sendType = ImageSendType.LocalFile,ImageSubType subtype = ImageSubType.Normal)
         {
             string FPrefix = "";
-            if (SendType == ImageSendType.LocalFile)
+            if (sendType == ImageSendType.LocalFile)
             {
                 FPrefix = "file:///";
             }
-            else if (SendType == ImageSendType.Base64)
+            else if (sendType == ImageSendType.Base64)
             {
                 FPrefix = "base64://";
             }
-            MsgChain.Add(new JObject()
+            _msgChain.Add(new JObject()
             {
                 { "type" , "image" },
                 { "data" ,  new JObject(){
-                    { "file" , $"{FPrefix}{ImageContent}" },
-                    { "subType" , (int)Subtype }
+                    { "file" , $"{FPrefix}{imageContent}" },
+                    { "subType" , (int)subtype }
                 } },
             });
             return this;
         }
-        public MsgBuilder At(long AtUin)
+        public MsgBuilder At(long atUin)
         {
-            MsgChain.Add(new JObject()
+            _msgChain.Add(new JObject()
             {
                 { "type" , "at" },
                 { "data" ,  new JObject(){
-                    { "qq" , AtUin }
+                    { "qq" , atUin }
                 } },
             });
             return this;
         }
-        public MsgBuilder Reply(int MsgId)
+        public MsgBuilder Reply(int msgId)
         {
-            MsgChain.Add(new JObject()
+            _msgChain.Add(new JObject()
             {
                 { "type" , "reply" },
                 { "data" ,  new JObject(){
-                    { "id" , $"{MsgId}" }
+                    { "id" , $"{msgId}" }
                 } },
             });
             return this;
         }
         public List<JObject> Build()
         {
-            return MsgChain;
+            return _msgChain;
         }
     }
 }

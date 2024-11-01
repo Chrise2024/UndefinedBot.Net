@@ -8,7 +8,7 @@ namespace UndefinedBot.Net.Utils
 {
     public class ConfigManager
     {
-        private readonly List<string> DefaultCommands = [
+        private readonly List<string> _defaultCommands = [
             "help",
             "symmet",
             "hito",
@@ -20,7 +20,7 @@ namespace UndefinedBot.Net.Utils
             "homo",
             "histoday",
         ];
-        private readonly JSchema ConfigJsonSchema = JSchema.Parse(
+        private readonly JSchema _configJsonSchema = JSchema.Parse(
             @"
             {
             ""type"": ""object"",
@@ -34,11 +34,11 @@ namespace UndefinedBot.Net.Utils
             }"
             );
 
-        private readonly string ConfigPath = Path.Join(Program.GetProgramRoot(), "config.json");
+        private readonly string _configPath = Path.Join(Program.GetProgramRoot(), "config.json");
 
-        private ConfigSchematics Config;
+        private ConfigSchematics _config;
 
-        private readonly ConfigSchematics DefaultConfig = new("http://127.0.0.1:8087/", "http://127.0.0.1:8085", [], "#");
+        private readonly ConfigSchematics _defaultConfig = new("http://127.0.0.1:8087/", "http://127.0.0.1:8085", [], "#");
 
         /*
          * 8087为Bot上报消息的Url，即当前程序开启的Http Server地址
@@ -47,48 +47,48 @@ namespace UndefinedBot.Net.Utils
 
         public ConfigManager()
         {
-            if (!File.Exists(ConfigPath))
+            if (!File.Exists(_configPath))
             {
-                FileIO.WriteAsJSON<ConfigSchematics>(ConfigPath, DefaultConfig);
-                Config = DefaultConfig;
+                FileIO.WriteAsJSON<ConfigSchematics>(_configPath, _defaultConfig);
+                _config = _defaultConfig;
             }
             else
             {
-                JObject RConfig = FileIO.ReadAsJSON(ConfigPath);
-                if (RConfig.IsValid(ConfigJsonSchema))
+                JObject RConfig = FileIO.ReadAsJSON(_configPath);
+                if (RConfig.IsValid(_configJsonSchema))
                 {
-                    Config = RConfig.ToObject<ConfigSchematics>();
+                    _config = RConfig.ToObject<ConfigSchematics>();
                 }
                 else
                 {
-                    Config = DefaultConfig;
-                    FileIO.WriteAsJSON<ConfigSchematics>(ConfigPath, DefaultConfig);
+                    _config = _defaultConfig;
+                    FileIO.WriteAsJSON<ConfigSchematics>(_configPath, _defaultConfig);
                 }
             }
         }
         public string GetHttpServerUrl()
         {
-            return Config.HttpServerUrl;
+            return _config.HttpServerUrl;
         }
         public string GetHttpPostUrl()
         {
-            return Config.HttpPostUrl;
+            return _config.HttpPostUrl;
         }
         public List<long> GetGroupList()
         {
-            return Config.GroupId;
+            return _config.GroupId;
         }
         public List<string> GetCommandList()
         {
-            return DefaultCommands;
+            return _defaultCommands;
         }
         public string GetCommandPrefix()
         {
-            return Config.CommandPrefix;
+            return _config.CommandPrefix;
         }
         private void SaveConfig()
         {
-            FileIO.WriteAsJSON<ConfigSchematics>(ConfigPath, Config);
+            FileIO.WriteAsJSON<ConfigSchematics>(_configPath, _config);
         }
     }
 }

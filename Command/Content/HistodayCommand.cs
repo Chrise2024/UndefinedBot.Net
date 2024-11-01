@@ -5,32 +5,37 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Command.Content
 {
-    public class HistodayCommand
+    public class HistodayCommand : IBaseCommand
     {
-        public string CommandName { get; } = "histoday";
-        public string CommandDescription { get; } = string.Format("---------------help---------------\n{0}histoday - 历史上的今天\n使用方法：{0}histoday\ne.g. {0}histoday", Program.GetConfigManager().GetCommandPrefix());
-
-        private readonly Logger CommandLogger = new("Command", "Histoday");
-        public async Task Handle(ArgSchematics Args)
+        public string CommandName { get; private set; } = "histoday";
+        public string CommandDescription { get; private set; } = "{0}histoday - 历史上的今天\n使用方法：{0}histoday\ne.g. {0}histoday";
+        public string CommandShortDescription { get; private set; } = "{0}histoday - 历史上的今天";
+        public Logger CommandLogger { get; private set; } = new("Command", "Undefined");
+        public async Task Execute(ArgSchematics args)
         {
-            //ParamFormat: Any
-            if (Args.Command.Equals(CommandName))
+            string ImageCachePath = Histoday.GenHistodayImage();
+            await HttpApi.SendGroupMsg(
+                            args.GroupId,
+                            new MsgBuilder()
+                                .Image(ImageCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
+                        );
+            FileIO.SafeDeleteFile(ImageCachePath);
+            CommandLogger.Info("Command Completed");
+        }
+        public async Task Handle(ArgSchematics args)
+        {
+            if (args.Command.Equals(CommandName))
             {
                 CommandLogger.Info("Command Triggered");
-                string ImageCachePath = Histoday.GenHistodayImage();
-                await HttpApi.SendGroupMsg(
-                                Args.GroupId,
-                                new MsgBuilder()
-                                    .Image(ImageCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
-                            );
-                FileIO.SafeDeleteFile(ImageCachePath);
+                await Execute(args);
                 CommandLogger.Info("Command Completed");
             }
         }
         public void Init()
         {
+            CommandLogger = new("Command", CommandName);
             MsgHandler.GetCommandHandler().CommandEvent += Handle;
-            CommandLogger.Info("Loaded");
+            CommandLogger.Info("Command Loaded");
         }
     }
 }

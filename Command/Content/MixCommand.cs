@@ -5,50 +5,54 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Command.Content
 {
-    public class MixCommand
+    public class MixCommand : IBaseCommand
     {
-        public string CommandName { get; } = "mix";
-        public string CommandDescription { get; } = string.Format("---------------help---------------\n{0}mix - 混合Emoji\n使用方法：{0}mix Emoji1 Emoji2\ne.g. {0}mix 😀 😁", Program.GetConfigManager().GetCommandPrefix());
-
-        private readonly Logger CommandLogger = new("Command", "Mix");
-        public async Task Handle(ArgSchematics Args)
+        public string CommandName { get; private set; } = "mix";
+        public string CommandDescription { get; private set; } = "{0}mix - 混合Emoji\n使用方法：{0}mix Emoji1 Emoji2\ne.g. {0}mix 😀 😁";
+        public string CommandShortDescription { get; private set; } = "{0}mix - 混合Emoji";
+        public Logger CommandLogger { get; private set; } = new("Command", "Undefined");
+        public async Task Execute(ArgSchematics args)
         {
-            //ParamFormat: [Emoji1] [Emoji2] or [Emoji1Emoji2]
-            if (Args.Command.Equals(CommandName))
+            if (args.Param.Count > 0)
             {
-                CommandLogger.Info("Command Triggered");
-                if (Args.Param.Count > 0)
+                string MixRes = EmojiMix.MixEmoji(args.Param);
+                if (MixRes.Length > 0)
                 {
-                    string MixRes = EmojiMix.MixEmoji(Args.Param);
-                    if (MixRes.Length > 0)
-                    {
-                        await HttpApi.SendGroupMsg(
-                                        Args.GroupId,
-                                        new MsgBuilder()
-                                            .Reply(Args.MsgId)
-                                            .Image(MixRes, ImageSendType.Url).Build()
-                                    );
-                    }
-                    else
-                    {
-                        await HttpApi.SendGroupMsg(
-                                Args.GroupId,
-                                new MsgBuilder()
-                                    .Text("似乎不能混合").Build()
-                            );
-                    }
+                    await HttpApi.SendGroupMsg(
+                                    args.GroupId,
+                                    new MsgBuilder()
+                                        .Reply(args.MsgId)
+                                        .Image(MixRes, ImageSendType.Url).Build()
+                                );
                 }
                 else
                 {
-                    CommandLogger.Error($"Unproper Arg: Too Less Args");
+                    await HttpApi.SendGroupMsg(
+                            args.GroupId,
+                            new MsgBuilder()
+                                .Text("似乎不能混合").Build()
+                        );
                 }
+            }
+            else
+            {
+                CommandLogger.Error($"Unproper Arg: Too Less args");
+            }
+        }
+        public async Task Handle(ArgSchematics args)
+        {
+            if (args.Command.Equals(CommandName))
+            {
+                CommandLogger.Info("Command Triggered");
+                await Execute(args);
                 CommandLogger.Info("Command Completed");
             }
         }
         public void Init()
         {
+            CommandLogger = new("Command", CommandName);
             MsgHandler.GetCommandHandler().CommandEvent += Handle;
-            CommandLogger.Info("Loaded");
+            CommandLogger.Info("Command Loaded");
         }
     }
 }

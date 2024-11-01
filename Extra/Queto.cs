@@ -11,9 +11,9 @@ namespace UndefinedBot.Net.Extra
 {
     public class Queto
     {
-        public static string GenQuetoImage(string TargetMsgIdString)
+        public static string GenQuetoImage(string targetMsgIdString)
         {
-            MsgBodySchematics TargetMsg = HttpApi.GetMsg(Int32.TryParse(TargetMsgIdString, out int TargetMsgId) ? TargetMsgId : 0).Result;
+            MsgBodySchematics TargetMsg = HttpApi.GetMsg(Int32.TryParse(targetMsgIdString, out int TargetMsgId) ? TargetMsgId : 0).Result;
             if ((TargetMsg.MessageId ?? 0) == 0)
             {
                 return "";
@@ -157,16 +157,16 @@ namespace UndefinedBot.Net.Extra
             { "273" , "🍋" },
             { "325" , "😱" }
         };
-        public static void GenTextImage(string TempFilePath, string Text, int FontSize, int Width, int Height)
+        public static void GenTextImage(string tempFilePath, string text, int fontSize, int width, int height)
         {
             //Location:SKPoint->Bottom Center
-            var Surface = SKSurface.Create(new SKImageInfo(Width, Height));
+            var Surface = SKSurface.Create(new SKImageInfo(width, height));
             SKCanvas Canvas = Surface.Canvas;
             Canvas.Clear(SKColors.Transparent);
-            DrawTextWithWrapping(Canvas, Text, new SKRect(0, 0, Width, Height), FontSize);
+            DrawTextWithWrapping(Canvas, text, new SKRect(0, 0, width, height), fontSize);
             SKImage TempImage = Surface.Snapshot();
             SKData TempData = TempImage.Encode(SKEncodedImageFormat.Png, 100);
-            FileStream TempFileStream = File.OpenWrite(TempFilePath);
+            FileStream TempFileStream = File.OpenWrite(tempFilePath);
             if (TempFileStream != null)
             {
                 TempData.SaveTo(TempFileStream);
@@ -177,12 +177,12 @@ namespace UndefinedBot.Net.Extra
             Canvas.Dispose();
             Surface.Dispose();
         }
-        private static void DrawTextWithWrapping(SKCanvas canvas, string text, SKRect TextArea, int FontSize)
+        private static void DrawTextWithWrapping(SKCanvas canvas, string text, SKRect textArea, int fontSize)
         {
             SKPaint PaintEmoji = new SKPaint
             {
                 Typeface = SKTypeface.FromFamilyName("Segoe UI Emoji"),
-                TextSize = FontSize,
+                TextSize = fontSize,
                 Color = SKColors.White,
                 IsAntialias = true,
                 StrokeWidth = 1,
@@ -192,21 +192,21 @@ namespace UndefinedBot.Net.Extra
             SKPaint PaintText = new SKPaint
             {
                 Typeface = SKTypeface.FromFamilyName("Simsun"),
-                TextSize = FontSize,
+                TextSize = fontSize,
                 Color = SKColors.White,
                 IsAntialias = true,
                 StrokeWidth = 1,
                 TextAlign = SKTextAlign.Center,
                 IsLinearText = true,
             };
-            SKPoint DrawPosition = new(TextArea.Width / 2, FontSize);
-            List<List<string>> Lines = SplitString(text, FontSize, TextArea.Width - FontSize * 1.5F, PaintText);
-            float yOffset = (TextArea.Height / 2) - (Lines.Count * FontSize / 2);
+            SKPoint DrawPosition = new(textArea.Width / 2, fontSize);
+            List<List<string>> Lines = SplitString(text, fontSize, textArea.Width - fontSize * 1.5F, PaintText);
+            float yOffset = (textArea.Height / 2) - (Lines.Count * fontSize / 2);
             for (int i = 0; i < Lines.Count; i++)
             {
                 DrawLine(canvas, Lines[i], new SKPoint(DrawPosition.X, DrawPosition.Y + yOffset), PaintEmoji, PaintText);
-                yOffset += FontSize;
-                if (yOffset + FontSize > TextArea.Height)
+                yOffset += fontSize;
+                if (yOffset + fontSize > textArea.Height)
                 {
                     break;
                 }
@@ -214,32 +214,32 @@ namespace UndefinedBot.Net.Extra
             PaintEmoji.Dispose();
             PaintText.Dispose();
         }
-        private static void DrawLine(SKCanvas canvas, List<string> LineText, SKPoint LinePosition, SKPaint PaintEmoji, SKPaint PaintText)
+        private static void DrawLine(SKCanvas canvas, List<string> lineText, SKPoint linePosition, SKPaint paintEmoji, SKPaint paintText)
         {
-            float FontSize = PaintText.TextSize;
+            float FontSize = paintText.TextSize;
             float LineWidth = 0;
-            foreach (string index in LineText)
+            foreach (string index in lineText)
             {
-                LineWidth += IsEmoji(index) ? PaintEmoji.MeasureText(index) : PaintText.MeasureText(index);
+                LineWidth += IsEmoji(index) ? paintEmoji.MeasureText(index) : paintText.MeasureText(index);
             }
-            float LPos = LinePosition.X - LineWidth / 2 + FontSize / 2;
-            foreach (string TE in LineText)
+            float LPos = linePosition.X - LineWidth / 2 + FontSize / 2;
+            foreach (string TE in lineText)
             {
                 if (IsEmoji(TE))
                 {
-                    canvas.DrawText(TE, LPos + PaintEmoji.MeasureText(TE) / 2, LinePosition.Y, PaintEmoji);
-                    LPos += PaintEmoji.MeasureText(TE);
+                    canvas.DrawText(TE, LPos + paintEmoji.MeasureText(TE) / 2, linePosition.Y, paintEmoji);
+                    LPos += paintEmoji.MeasureText(TE);
                 }
                 else
                 {
-                    canvas.DrawText(TE, LPos + PaintText.MeasureText(TE) / 2, LinePosition.Y, PaintText);
-                    LPos += PaintText.MeasureText(TE);
+                    canvas.DrawText(TE, LPos + paintText.MeasureText(TE) / 2, linePosition.Y, paintText);
+                    LPos += paintText.MeasureText(TE);
                 }
             }
         }
-        private static List<List<string>> SplitString(string input, int FontSize, float Width, SKPaint CurrentPaint)
+        private static List<List<string>> SplitString(string input, int fontSize, float width, SKPaint currentPaint)
         {
-            Width -= FontSize;
+            width -= fontSize;
             List<List<string>> output = [];
             List<string> TempLine = [];
             List<string> Elements = [];
@@ -266,13 +266,13 @@ namespace UndefinedBot.Net.Extra
                     }
                     if (IsEmoji(Elements[index - 1]))
                     {
-                        CLength += CurrentPaint.TextSize * 1.5F;
+                        CLength += currentPaint.TextSize * 1.5F;
                     }
                     else
                     {
-                        CLength += CurrentPaint.MeasureText(Elements[index - 1]);
+                        CLength += currentPaint.MeasureText(Elements[index - 1]);
                     }
-                    if (CLength > Width)
+                    if (CLength > width)
                     {
                         if (TempString.Length > 0)
                         {
@@ -296,25 +296,25 @@ namespace UndefinedBot.Net.Extra
                 return [[input]];
             }
         }
-        private static bool IsEmoji(string TextElement)
+        private static bool IsEmoji(string textElement)
         {
-            UnicodeCategory UC = CharUnicodeInfo.GetUnicodeCategory(TextElement.Length > 0 ? TextElement[0] : ' ');
+            UnicodeCategory UC = CharUnicodeInfo.GetUnicodeCategory(textElement.Length > 0 ? textElement[0] : ' ');
             return UC == UnicodeCategory.OtherSymbol || UC == UnicodeCategory.ModifierSymbol ||
                    UC == UnicodeCategory.PrivateUse || UC == UnicodeCategory.Surrogate;
         }
-        private static bool IsASCII(char IC)
+        private static bool IsASCII(char inputChar)
         {
-            return IC >= 0x00 && IC < 0xFF;
+            return inputChar >= 0x00 && inputChar < 0xFF;
         }
-        private static bool IsASCII(string TextElement)
+        private static bool IsASCII(string textElement)
         {
-            if (TextElement.Length != 1)
+            if (textElement.Length != 1)
             {
                 return false;
             }
             else
             {
-                return TextElement[0] >= 0x00 && TextElement[0] < 0xFF;
+                return textElement[0] >= 0x00 && textElement[0] < 0xFF;
             }
         }
     }

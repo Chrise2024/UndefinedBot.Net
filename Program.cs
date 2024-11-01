@@ -10,8 +10,6 @@ using UndefinedBot.Net.Command;
 using UndefinedBot.Net.Extra;
 using UndefinedBot.Net.NetWork;
 using UndefinedBot.Net.Utils;
-using ImageMagick;
-using System.Globalization;
 
 namespace UndefinedBot.Net
 {
@@ -23,39 +21,26 @@ namespace UndefinedBot.Net
 
         private static readonly string ProgramLocal = Path.Join(ProgramRoot, "Local");
 
-        private static readonly ConfigManager MainConfigManager = new();
+        private static readonly ConfigManager s_mainConfigManager = new();
 
-        private static readonly HttpServer HServer = new(MainConfigManager.GetHttpServerUrl());
+        private static readonly HttpServer s_httpServer = new(s_mainConfigManager.GetHttpServerUrl());
 
-        private static readonly Logger MainLogger = new("Program");
+        private static readonly Logger s_mainLogger = new("Program");
 
-        private static readonly Assembly MainAssembly = Assembly.GetExecutingAssembly();
-        //Name -> Description
-        private static readonly Dictionary<string, string> CommandReference = [];
+        private static readonly Assembly s_mainAssembly = Assembly.GetExecutingAssembly();
+
+        private static readonly Dictionary<string,CommandPropertieSchematics> s_commandReference = CommandInitializer.InitCommand();
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
             FileIO.EnsurePath(ProgramCahce);
             FileIO.EnsurePath(ProgramLocal);
-            //Activate Commands
-            IEnumerable<Type> types = MainAssembly.GetTypes().Where(t => t.Namespace == "UndefinedBot.Net.Command.Content" && t.IsClass);
-            foreach (Type type in types)
-            {
-                var instance = Activator.CreateInstance(type);
-                MethodInfo? method = type.GetMethod("Init");
-                PropertyInfo? NameInfo = type.GetProperty("CommandName");
-                PropertyInfo? DescriptionInfo = type.GetProperty("CommandDescription");
-                if (NameInfo?.GetValue(instance) is string CName && DescriptionInfo?.GetValue(instance) is string CDescription)
-                {
-                    method?.Invoke(instance, null);
-                    CommandReference.Add(CName, CDescription);
-                }
-            }
-            MsgHandler.UpdateCL([.. CommandReference.Keys]);
+            //Console.WriteLine(JsonConvert.SerializeObject(s_commandReference,Formatting.Indented));
+            MsgHandler.UpdateCommandList([.. s_commandReference.Keys]);
             if (!File.Exists(Path.Join(ProgramLocal, "QSplash.png")))
             {
-                Stream? stream = MainAssembly.GetManifestResourceStream("UndefinedBot.Net.Local.QSplash.png");
+                Stream? stream = s_mainAssembly.GetManifestResourceStream("UndefinedBot.Net.Local.QSplash.png");
                 if (stream != null)
                 {
                     Image CoverImage = Image.FromStream(stream);
@@ -64,19 +49,19 @@ namespace UndefinedBot.Net
                 }
                 stream?.Close();
             }
-            MainLogger.Info("Bot Launched");
-            Task.Run(HServer.Start);
+            s_mainLogger.Info("Bot Launched");
+            Task.Run(s_httpServer.Start);
             string TempString;
             while (true)
             {
                 TempString = Console.ReadLine() ?? "";
                 if (TempString.Equals("stop"))
                 {
-                    HServer.Stop();
+                    s_httpServer.Stop();
                     break;
                 }
             }
-            MainLogger.Info("Bot Colsed");
+            s_mainLogger.Info("Bot Colsed");
             Console.ReadKey();
         }
         public static string GetProgramRoot()
@@ -93,11 +78,11 @@ namespace UndefinedBot.Net
         }
         public static ConfigManager GetConfigManager()
         {
-            return MainConfigManager;
+            return s_mainConfigManager;
         }
-        public static Dictionary<string,string> GetCommandReference()
+        public static Dictionary<string,CommandPropertieSchematics> GetCommandReference()
         {
-            return CommandReference;
+            return s_commandReference;
         }
     }
 }

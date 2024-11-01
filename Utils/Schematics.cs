@@ -5,33 +5,33 @@ using Newtonsoft.Json.Linq;
 namespace UndefinedBot.Net.Utils
 {
     public struct ConfigSchematics(
-        string HttpServerUrl,
-        string HttpPostUrl,
-        List<long> GroupId,
-        string CommandPrefix
+        string httpServerUrl,
+        string httpPostUrl,
+        List<long> groupId,
+        string commandPrefix
         )
     {
-        [JsonProperty("http_server_url")] public string HttpServerUrl = HttpServerUrl;
-        [JsonProperty("http_post_url")] public string HttpPostUrl = HttpPostUrl;
-        [JsonProperty("group_id")] public List<long> GroupId = GroupId;
-        [JsonProperty("command_prefix")] public string CommandPrefix = CommandPrefix;
+        [JsonProperty("http_server_url")] public string HttpServerUrl = httpServerUrl;
+        [JsonProperty("http_post_url")] public string HttpPostUrl = httpPostUrl;
+        [JsonProperty("group_id")] public List<long> GroupId = groupId;
+        [JsonProperty("command_prefix")] public string CommandPrefix = commandPrefix;
     }
 
     public struct ArgSchematics(
-        string Command,
-        List<string> Param,
-        long CallerUin,
-        long GroupId,
-        int MsgId,
-        bool Status
+        string command,
+        List<string> param,
+        long callerUin,
+        long groupId,
+        int msgId,
+        bool status
         )
     {
-        public string Command = Command;
-        public List<string> Param = Param;
-        public long CallerUin = CallerUin;
-        public long GroupId = GroupId;
-        public int MsgId = MsgId;
-        public bool Status = Status;
+        public string Command = command;
+        public List<string> Param = param;
+        public long CallerUin = callerUin;
+        public long GroupId = groupId;
+        public int MsgId = msgId;
+        public bool Status = status;
     }
 
     public struct CQEntitySchematics(string CQType)
@@ -96,6 +96,13 @@ namespace UndefinedBot.Net.Utils
         [JsonProperty("raw_message")] public string? RawMessage;
         [JsonProperty("font")] public int? Font;
         [JsonProperty("sender")] public MsgSenderSchematics? Sender;
+    }
+    public struct CommandPropertieSchematics(string name, string description, string shortDescription,object instance)
+    {
+        public string Name = name;
+        public string Description = description;
+        public string ShortDescription = shortDescription;
+        public object Instance = instance;
     }
     public class Schematics
     {

@@ -6,19 +6,19 @@ namespace UndefinedBot.Net.Extra
 {
     public class Homo
     {
-        public static string Homoize(string Input,out bool Status)
+        public static string Homoize(string input,out bool status)
         {
-            if (Int64.TryParse(Input, out var InputNumber))
+            if (Int64.TryParse(input, out var inputNumber))
             {
-                if (InputNumber == 114514)
+                if (inputNumber == 114514)
                 {
-                    Status = false;
+                    status = false;
                     return "这么恶臭的数字无法再恶臭下去了";
                 }
                 else
                 {
-                    Status = true;
-                    string TempResult = CalcHomo(InputNumber);
+                    status = true;
+                    string TempResult = CalcHomo(inputNumber);
                     TempResult = Regex.Replace(TempResult, @"([\*|\/])\(([^\+\-\(\)]+)\)", match => {
                         return $"{match.Groups[1].Value}{match.Groups[2].Value}";
                     });
@@ -33,45 +33,45 @@ namespace UndefinedBot.Net.Extra
             }
             else
             {
-                Status = false;
+                status = false;
                 return "你肯定输入了一些奇怪的东西，爬爬";
             }
         }
-        private static string CalcHomo(long InputNumber)
+        private static string CalcHomo(long inputNumber)
         {
-            if (InputNumber < 0)
+            if (inputNumber < 0)
             {
-                return $"({HomoDict[-1]})*({CalcHomo(InputNumber * -1)})";
+                return $"({s_homoDict[-1]})*({CalcHomo(inputNumber * -1)})";
             }
             else
             {
-                //Console.WriteLine($"{InputNumber} - {HomoDict.ContainsKey(InputNumber)}");
-                if (HomoDict.TryGetValue(InputNumber, out var Result))
+                //Console.WriteLine($"{inputNumber} - {HomoDict.ContainsKey(inputNumber)}");
+                if (s_homoDict.TryGetValue(inputNumber, out var Result))
                 {
-                    //Console.WriteLine($"{InputNumber} - {Result}");
+                    //Console.WriteLine($"{inputNumber} - {Result}");
                     return Result;
                 }
                 else
                 {
-                    long NumberDiv = GetMinDiv(InputNumber);
-                    string RTemp = $"{CalcHomo(NumberDiv)}*({CalcHomo((long)Math.Floor(1.0D * InputNumber / NumberDiv))})+{CalcHomo(InputNumber % NumberDiv)}";
+                    long NumberDiv = GetMinDiv(inputNumber);
+                    string RTemp = $"{CalcHomo(NumberDiv)}*({CalcHomo((long)Math.Floor(1.0D * inputNumber / NumberDiv))})+{CalcHomo(inputNumber % NumberDiv)}";
                     return RegexProvider.GetEmptyMultipleEmelment().Replace(RTemp,"");
                 }
             }
         }
-        private static long GetMinDiv(long InputNumber)
+        private static long GetMinDiv(long inputNumber)
         {
-            List<long> HomoDictKeyR = [.. HomoDict.Keys];
+            List<long> HomoDictKeyR = [..s_homoDict.Keys];
             foreach (long index in HomoDictKeyR)
             {
-                if (InputNumber > index)
+                if (inputNumber > index)
                 {
                     return index;
                 }
             }
             return 1;
         }
-        public static readonly Dictionary<long, string> HomoDict = new()
+        public static readonly Dictionary<long, string> s_homoDict = new()
         {
             { 114514 , "114514" },
             { 58596 , "114*514" },

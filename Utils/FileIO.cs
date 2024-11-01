@@ -76,10 +76,10 @@ namespace UndefinedBot.Net.Utils
                 return "";
             }
         }
-        public static void WriteFile(string tPath, string Content)
+        public static void WriteFile(string tPath, string content)
         {
-            EnsureFile(tPath, Content);
-            File.WriteAllText(tPath, Content);
+            EnsureFile(tPath, content);
+            File.WriteAllText(tPath, content);
             return;
         }
         public static JObject ReadAsJSON(string tPath)

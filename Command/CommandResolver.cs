@@ -11,46 +11,46 @@ namespace UndefinedBot.Net.Command
 {
     public class CommandResolver
     {
-        private static readonly ArgSchematics InvalidCommandArg = new("null", [], 0,  0, 0, false);
+        private static readonly ArgSchematics s_invalidCommandArg = new("null", [], 0,  0, 0, false);
 
-        private static readonly ArgSchematics NoneCommandArg = new("", [],0,0,0, false);
+        private static readonly ArgSchematics s_noneCommandArg = new("", [],0,0,0, false);
 
-        private static readonly List<long> WorkGRoup = Program.GetConfigManager().GetGroupList();
+        private static readonly List<long> s_workGRoup = Program.GetConfigManager().GetGroupList();
 
-        private static readonly string CommandPrefix = Program.GetConfigManager().GetCommandPrefix();
+        private static readonly string s_commandPrefix = Program.GetConfigManager().GetCommandPrefix();
 
-        private static readonly Logger ArgLogger = new("CommandResolver", "ArgParse");
+        private static readonly Logger s_argLogger = new("CommandResolver", "ArgParse");
 
-        private static readonly Logger HandleLogger = new("CommandResolver", "HandleMsg");
-        public static ArgSchematics Parse(MsgBodySchematics MsgBody)
+        private static readonly Logger s_handleLogger = new("CommandResolver", "HandleMsg");
+        public static ArgSchematics Parse(MsgBodySchematics msgBody)
         {
-            long GroupId = MsgBody.GroupId ?? 0;
-            long CallerUin = MsgBody.UserId ?? 0;
-            int MsgId = MsgBody.MessageId ?? 0;
-            string CQString = MsgBody.RawMessage ?? "";
+            long GroupId = msgBody.GroupId ?? 0;
+            long CallerUin = msgBody.UserId ?? 0;
+            int MsgId = msgBody.MessageId ?? 0;
+            string CQString = msgBody.RawMessage ?? "";
             if (MsgId == 0)
             {
-                ArgLogger.Error("Invalid Msg Body");
-                return NoneCommandArg;
+                s_argLogger.Error("Invalid Msg Body");
+                return s_noneCommandArg;
             }
             else if (CQString.Length == 0)
             {
-                ArgLogger.Error("Raw Msg Is Null");
-                return NoneCommandArg;
+                s_argLogger.Error("Raw Msg Is Null");
+                return s_noneCommandArg;
             }
             else
             {
-                ArgLogger.Info("Resolving, Raw = " + CQString);
+                s_argLogger.Info("Resolving, Raw = " + CQString);
                 Match MatchCQReply = RegexProvider.GetCQReplyRegex().Match(CQString);
                 if (MatchCQReply.Success)
                 {
                     CQEntitySchematics CQEntity = DecodeCQEntity(MatchCQReply.Value);
                     int TargetMsgId = Int32.Parse(CQEntity.Properties.TryGetValue("id", out var IntMsgId) ? IntMsgId : "0");
                     string NormalCQString = CQString.Replace(MatchCQReply.Value, "").Trim();
-                    if ( NormalCQString.StartsWith(CommandPrefix))
+                    if ( NormalCQString.StartsWith(s_commandPrefix))
                     {
-                        List<string> Params = ParseCQString(NormalCQString[CommandPrefix.Length..]);
-                        ArgLogger.Info("Parse Complete");
+                        List<string> Params = ParseCQString(NormalCQString[s_commandPrefix.Length..]);
+                        s_argLogger.Info("Parse Complete");
                         return new ArgSchematics(
                             Params[0],
                             [$"{TargetMsgId}", ..Params[1..]],
@@ -61,10 +61,10 @@ namespace UndefinedBot.Net.Command
                             );
                     }
                 }
-                else if (CQString.StartsWith(CommandPrefix) && !CQString.Equals(CommandPrefix))
+                else if (CQString.StartsWith(s_commandPrefix) && !CQString.Equals(s_commandPrefix))
                 {
-                    List<string> Params = ParseCQString(CQString[CommandPrefix.Length..]);
-                    ArgLogger.Info("Parse Complete");
+                    List<string> Params = ParseCQString(CQString[s_commandPrefix.Length..]);
+                    s_argLogger.Info("Parse Complete");
                     return new ArgSchematics(
                             Params[0],
                             Params[1..],
@@ -74,9 +74,9 @@ namespace UndefinedBot.Net.Command
                             true
                             );
                 }
-                ArgLogger.Info("Parse Complete");
+                s_argLogger.Info("Parse Complete");
             }
-            return NoneCommandArg;
+            return s_noneCommandArg;
         }
 
         private static List<string> ParseCQString(string CQString)
@@ -151,11 +151,11 @@ namespace UndefinedBot.Net.Command
             return CQEntity;
         }
 
-        public static string ExtractUrlFromMsg(MsgBodySchematics MsgBody)
+        public static string ExtractUrlFromMsg(MsgBodySchematics msgBody)
         {
-            if (MsgBody.Message?.Count > 0)
+            if (msgBody.Message?.Count > 0)
             {
-                List<JObject> MsgChain = MsgBody.Message;
+                List<JObject> MsgChain = msgBody.Message;
                 if (MsgChain.Count > 0)
                 {
                     JObject Msg = MsgChain[0];

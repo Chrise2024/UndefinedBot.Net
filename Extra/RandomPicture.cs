@@ -8,7 +8,7 @@ namespace UndefinedBot.Net.Extra
 {
     public class RandomPicture
     {
-        private static readonly Random RandomRoot = new();
+        private static readonly Random s_randomRoot = new();
 
         public static string GetRandomContent(string RandType)
         {
@@ -42,7 +42,7 @@ namespace UndefinedBot.Net.Extra
         {
             try
             {
-                JObject Resp = JObject.Parse(HttpRequest.Get($"https://www.bing.com/HPImageArchive.aspx?format=js&idx={RandomRoot.Next(0, 32767)}&n=1").Result);
+                JObject Resp = JObject.Parse(HttpRequest.Get($"https://www.bing.com/HPImageArchive.aspx?format=js&idx={s_randomRoot.Next(0, 32767)}&n=1").Result);
                 List<JObject> IA = Resp["images"]?.ToObject<List<JObject>>() ?? [];
                 if (IA.Count > 0)
                 {
@@ -61,13 +61,13 @@ namespace UndefinedBot.Net.Extra
         }
         private static string RandomFox()
         {
-            return $"https://randomfox.ca/images/{RandomRoot.Next(1,124)}.jpg";
+            return $"https://randomfox.ca/images/{s_randomRoot.Next(1,124)}.jpg";
         }
         private static string RandomCat()
         {
             try
             {
-                if (RandomRoot.Next(1,100) > 64)
+                if (s_randomRoot.Next(1,100) > 64)
                 {
                     List<JObject> IA = JsonConvert.DeserializeObject<List<JObject>>(HttpRequest.Get("https://api.thecatapi.com/v1/images/search").Result) ?? [];
                     if (IA.Count > 0)
@@ -114,7 +114,7 @@ namespace UndefinedBot.Net.Extra
         {
             try
             {
-                if (RandomRoot.Next(1, 100) > 75)
+                if (s_randomRoot.Next(1, 100) > 75)
                 {
                     return HttpRequest.Get("https://www.loliapi.com/bg/?type=url").Result.Replace(".cn", ".com");
                 }

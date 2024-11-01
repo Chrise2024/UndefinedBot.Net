@@ -12,26 +12,26 @@ namespace UndefinedBot.Net.NetWork
 {
     public class HttpApi
     {
-        private static readonly string HttpPostUrl = Program.GetConfigManager().GetHttpPostUrl();
+        private static readonly string s_httpPostUrl = Program.GetConfigManager().GetHttpPostUrl();
 
-        private static readonly HttpClient HClient = new()
+        private static readonly HttpClient s_httpClient = new()
         {
             Timeout = TimeSpan.FromSeconds(20)
         };
 
-        private static readonly Logger HApiLogger = new("HttpRequest");
+        private static readonly Logger s_httpApiLogger = new("HttpRequest");
 
-        public static async Task SendGroupMsg<T>(T TargetGroupId,List<JObject> MsgChain)
+        public static async Task SendGroupMsg<T>(T targetGroupId,List<JObject> msgChain)
         {
             try
             {
                 object ReqJSON = new
                 {
-                    group_id = TargetGroupId,
-                    message = MsgChain
+                    group_id = targetGroupId,
+                    message = msgChain
                 };
                 //Console.WriteLine(JsonConvert.SerializeObject(ReqJSON));
-                await HClient.PostAsync(HttpPostUrl + "/send_group_msg",
+                await s_httpClient.PostAsync(s_httpPostUrl + "/send_group_msg",
                    new StringContent(
                        JsonConvert.SerializeObject(ReqJSON),
                        Encoding.UTF8,
@@ -42,25 +42,25 @@ namespace UndefinedBot.Net.NetWork
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine("Task Cacled: ");
-                HApiLogger.Error(ex.Message);
-                HApiLogger.Error(ex.StackTrace ?? "");
+                s_httpApiLogger.Error(ex.Message);
+                s_httpApiLogger.Error(ex.StackTrace ?? "");
             }
             catch (Exception ex)
             {
-                HApiLogger.Error("Error Occured, Error Information:");
-                HApiLogger.Error(ex.Message);
-                HApiLogger.Error(ex.StackTrace ?? "");
+                s_httpApiLogger.Error("Error Occured, Error Information:");
+                s_httpApiLogger.Error(ex.Message);
+                s_httpApiLogger.Error(ex.StackTrace ?? "");
             }
         }
-        public static async void RecallGroupMsg<T>(T MsgId)
+        public static async void RecallGroupMsg<T>(T msgId)
         {
             try
             {
                 object ReqJSON = new
                 {
-                    message_id = MsgId
+                    message_id = msgId
                 };
-                await HClient.PostAsync(HttpPostUrl + "/delete_msg",
+                await s_httpClient.PostAsync(s_httpPostUrl + "/delete_msg",
                    new StringContent(
                        JsonConvert.SerializeObject(ReqJSON),
                        Encoding.UTF8,
@@ -71,25 +71,25 @@ namespace UndefinedBot.Net.NetWork
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine("Task Cacled: ");
-                HApiLogger.Error(ex.Message);
-                HApiLogger.Error(ex.StackTrace ?? "");
+                s_httpApiLogger.Error(ex.Message);
+                s_httpApiLogger.Error(ex.StackTrace ?? "");
             }
             catch (Exception ex)
             {
-                HApiLogger.Error("Error Occured, Error Information:");
-                HApiLogger.Error(ex.Message);
-                HApiLogger.Error(ex.StackTrace ?? "");
+                s_httpApiLogger.Error("Error Occured, Error Information:");
+                s_httpApiLogger.Error(ex.Message);
+                s_httpApiLogger.Error(ex.StackTrace ?? "");
             }
         }
-        public static async Task<MsgBodySchematics> GetMsg<T>(T MsgId)
+        public static async Task<MsgBodySchematics> GetMsg<T>(T msgId)
         {
             try
             {
                 object ReqJSON = new
                 {
-                    message_id = MsgId
+                    message_id = msgId
                 };
-                HttpResponseMessage response = await HClient.PostAsync(HttpPostUrl + "/get_msg",
+                HttpResponseMessage response = await s_httpClient.PostAsync(s_httpPostUrl + "/get_msg",
                    new StringContent(
                        JsonConvert.SerializeObject(ReqJSON),
                        Encoding.UTF8,
@@ -101,8 +101,8 @@ namespace UndefinedBot.Net.NetWork
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine("Task Cacled: ");
-                HApiLogger.Error(ex.Message);
-                HApiLogger.Error(ex.StackTrace ?? "");
+                s_httpApiLogger.Error(ex.Message);
+                s_httpApiLogger.Error(ex.StackTrace ?? "");
                 return new MsgBodySchematics();
             }
             catch
@@ -110,17 +110,17 @@ namespace UndefinedBot.Net.NetWork
                 return new MsgBodySchematics();
             }
         }
-        public static async Task<GroupMemberSchematics> GetGroupMember<T1, T2>(T1 TargetGroupId, T2 TargetUin)
+        public static async Task<GroupMemberSchematics> GetGroupMember<T1, T2>(T1 targetGroupId, T2 targetUin)
         {
             try
             {
                 object ReqJSON = new
                 {
-                    group_id = TargetGroupId,
-                    user_id = TargetUin,
+                    group_id = targetGroupId,
+                    user_id = targetUin,
                     no_cache = false
                 };
-                HttpResponseMessage response = await HClient.PostAsync(HttpPostUrl + "/get_group_member_info",
+                HttpResponseMessage response = await s_httpClient.PostAsync(s_httpPostUrl + "/get_group_member_info",
                    new StringContent(
                        JsonConvert.SerializeObject(ReqJSON),
                        Encoding.UTF8,
@@ -132,8 +132,8 @@ namespace UndefinedBot.Net.NetWork
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine("Task Cacled: ");
-                HApiLogger.Error(ex.Message);
-                HApiLogger.Error(ex.StackTrace ?? "");
+                s_httpApiLogger.Error(ex.Message);
+                s_httpApiLogger.Error(ex.StackTrace ?? "");
                 return new GroupMemberSchematics();
             }
             catch
@@ -141,10 +141,10 @@ namespace UndefinedBot.Net.NetWork
                 return new GroupMemberSchematics();
             }
         }
-        public static async Task<HitokotoSchematics> GetHitokoto(string HType)
+        public static async Task<HitokotoSchematics> GetHitokoto(string htioType)
         {
             string Para = "";
-            foreach(char index in HType)
+            foreach(char index in htioType)
             {
                 if (index >= 'a' && index <= 'l')
                 {
@@ -153,14 +153,14 @@ namespace UndefinedBot.Net.NetWork
             }
             try
             {
-                HttpResponseMessage response = await HClient.GetAsync("https://v1.hitokoto.cn/?" + Para);
+                HttpResponseMessage response = await s_httpClient.GetAsync("https://v1.hitokoto.cn/?" + Para);
                 return JsonConvert.DeserializeObject<HitokotoSchematics>(response.Content.ReadAsStringAsync().Result);
             }
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine("Task Cacled: ");
-                HApiLogger.Error(ex.Message);
-                HApiLogger.Error(ex.StackTrace ?? "");
+                s_httpApiLogger.Error(ex.Message);
+                s_httpApiLogger.Error(ex.StackTrace ?? "");
                 return new HitokotoSchematics();
             }
             catch
@@ -168,11 +168,11 @@ namespace UndefinedBot.Net.NetWork
                 return new HitokotoSchematics();
             }
         }
-        public static async Task<Image> GetQQAvatar<T>(T TargetUin)
+        public static async Task<Image> GetQQAvatar<T>(T targetUin)
         {
             try
             {
-                byte[] ImageBytes = await HClient.GetByteArrayAsync($"http://q.qlogo.cn/headimg_dl?dst_uin={TargetUin}&spec=640&img_type=jpg");
+                byte[] ImageBytes = await s_httpClient.GetByteArrayAsync($"http://q.qlogo.cn/headimg_dl?dst_uin={targetUin}&spec=640&img_type=jpg");
                 if (ImageBytes.Length > 0)
                 {
                     MemoryStream ms = new MemoryStream(ImageBytes);
@@ -188,8 +188,8 @@ namespace UndefinedBot.Net.NetWork
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine("Task Cacled: ");
-                HApiLogger.Error(ex.Message);
-                HApiLogger.Error(ex.StackTrace ?? "");
+                s_httpApiLogger.Error(ex.Message);
+                s_httpApiLogger.Error(ex.StackTrace ?? "");
                 return new Bitmap(1, 1);
             }
             catch
@@ -197,26 +197,26 @@ namespace UndefinedBot.Net.NetWork
                 return new Bitmap(1,1);
             }
         }
-        public static async Task<bool> CheckUin(long TargetGroupId, long TargetUin)
+        public static async Task<bool> CheckUin(long targetGroupId, long targetUin)
         {
-            return ((await GetGroupMember(TargetGroupId, TargetUin)).GroupId ?? 0) != 0;
+            return ((await GetGroupMember(targetGroupId, targetUin)).GroupId ?? 0) != 0;
         }
     }
     public class HttpRequest
     {
-        private static readonly HttpClient HClient = new()
+        private static readonly HttpClient s_httpClient = new()
         {
             Timeout = TimeSpan.FromSeconds(5)
         };
 
-        private static readonly Logger HRequestLogger = new("HttpRequest");
+        private static readonly Logger s_httpRequestLogger = new("HttpRequest");
 
-        public static async Task<string> POST(string Url, object? Content = null)
+        public static async Task<string> POST(string Url, object? content = null)
         {
             try
             {
-                HttpResponseMessage response = await HClient.PostAsync(Url, Content == null ? null : new StringContent(
-                       JsonConvert.SerializeObject(Content),
+                HttpResponseMessage response = await s_httpClient.PostAsync(Url, content == null ? null : new StringContent(
+                       JsonConvert.SerializeObject(content),
                        Encoding.UTF8,
                        "application/json"
                    ));
@@ -225,60 +225,60 @@ namespace UndefinedBot.Net.NetWork
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine("Task Cacled: ");
-                HRequestLogger.Error(ex.Message);
-                HRequestLogger.Error(ex.StackTrace ?? "");
+                s_httpRequestLogger.Error(ex.Message);
+                s_httpRequestLogger.Error(ex.StackTrace ?? "");
                 return "";
             }
             catch (Exception ex)
             {
-                HRequestLogger.Error("Error Occured, Error Information:");
-                HRequestLogger.Error(ex.Message);
-                HRequestLogger.Error(ex.StackTrace ?? "");
+                s_httpRequestLogger.Error("Error Occured, Error Information:");
+                s_httpRequestLogger.Error(ex.Message);
+                s_httpRequestLogger.Error(ex.StackTrace ?? "");
                 return "";
             }
         }
 
-        public static async Task<string> Get(string Url)
+        public static async Task<string> Get(string url)
         {
             try
             {
-                HttpResponseMessage response = await HClient.GetAsync(Url);
+                HttpResponseMessage response = await s_httpClient.GetAsync(url);
                 return await response.Content.ReadAsStringAsync();
             }
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine("Task Cacled: ");
-                HRequestLogger.Error(ex.Message);
-                HRequestLogger.Error(ex.StackTrace ?? "");
+                s_httpRequestLogger.Error(ex.Message);
+                s_httpRequestLogger.Error(ex.StackTrace ?? "");
                 return "";
             }
             catch (Exception ex)
             {
-                HRequestLogger.Error("Error Occured, Error Information:");
-                HRequestLogger.Error(ex.Message);
-                HRequestLogger.Error(ex.StackTrace ?? "");
+                s_httpRequestLogger.Error("Error Occured, Error Information:");
+                s_httpRequestLogger.Error(ex.Message);
+                s_httpRequestLogger.Error(ex.StackTrace ?? "");
                 return "";
             }
         }
 
-        public static async Task<byte[]> GetBinary(string Url)
+        public static async Task<byte[]> GetBinary(string url)
         {
             try
             {
-                return await HClient.GetByteArrayAsync(Url);
+                return await s_httpClient.GetByteArrayAsync(url);
             }
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine("Task Cacled: ");
-                HRequestLogger.Error(ex.Message);
-                HRequestLogger.Error(ex.StackTrace ?? "");
+                s_httpRequestLogger.Error(ex.Message);
+                s_httpRequestLogger.Error(ex.StackTrace ?? "");
                 return [];
             }
             catch (Exception ex)
             {
-                HRequestLogger.Error("Error Occured, Error Information:");
-                HRequestLogger.Error(ex.Message);
-                HRequestLogger.Error(ex.StackTrace ?? "");
+                s_httpRequestLogger.Error("Error Occured, Error Information:");
+                s_httpRequestLogger.Error(ex.Message);
+                s_httpRequestLogger.Error(ex.StackTrace ?? "");
                 return [];
             }
         }

@@ -5,52 +5,56 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Command.Content
 {
-    public class HomoCommand
+    public class HomoCommand : IBaseCommand
     {
-        public string CommandName { get; } = "homo";
-        public string CommandDescription { get; } = string.Format("---------------help---------------\n{0}homo - 恶臭数字论证\n使用方法：{0}homo number\ne.g. {0}homo 10086", Program.GetConfigManager().GetCommandPrefix());
-
-        private readonly Logger CommandLogger = new("Command", "Homo");
-        public async Task Handle(ArgSchematics Args)
+        public string CommandName { get; private set; } = "homo";
+        public string CommandDescription { get; private set; } = "{0}homo - 恶臭数字论证\n使用方法：{0}homo number\ne.g. {0}homo 10086";
+        public string CommandShortDescription { get; private set; } = "{0}homo - 恶臭数字论证";
+        public Logger CommandLogger { get; private set; } = new("Command", "Undefined");
+        public async Task Execute(ArgSchematics args)
         {
-            //ParamFormat: [Text]
-            if (Args.Command.Equals(CommandName))
+            if (args.Param.Count > 0)
             {
-                CommandLogger.Info("Command Triggered");
-                if (Args.Param.Count > 0)
+                string Res = Homo.Homoize(args.Param[0], out bool Status);
+                if (Status)
                 {
-                    string Res = Homo.Homoize(Args.Param[0], out bool Status);
-                    if (Status)
-                    {
 
-                        await HttpApi.SendGroupMsg(
-                                            Args.GroupId,
-                                            new MsgBuilder()
-                                                //.Reply(Args.MsgId)
-                                                .Text($"{Args.Param[0]} = {Res}").Build()
-                                        );
-                    }
-                    else
-                    {
-                        await HttpApi.SendGroupMsg(
-                                            Args.GroupId,
-                                            new MsgBuilder()
-                                                //.Reply(Args.MsgId)
-                                                .Text($"{Res}").Build()
-                                        );
-                    }
+                    await HttpApi.SendGroupMsg(
+                                        args.GroupId,
+                                        new MsgBuilder()
+                                            //.Reply(args.MsgId)
+                                            .Text($"{args.Param[0]} = {Res}").Build()
+                                    );
                 }
                 else
                 {
-                    CommandLogger.Error($"Unproper Arg: Too Less Args, At Command <{Args.Command}>");
+                    await HttpApi.SendGroupMsg(
+                                        args.GroupId,
+                                        new MsgBuilder()
+                                            //.Reply(args.MsgId)
+                                            .Text($"{Res}").Build()
+                                    );
                 }
+            }
+            else
+            {
+                CommandLogger.Error($"Unproper Arg: Too Less args, At Command <{args.Command}>");
+            }
+        }
+        public async Task Handle(ArgSchematics args)
+        {
+            if (args.Command.Equals(CommandName))
+            {
+                CommandLogger.Info("Command Triggered");
+                await Execute(args);
                 CommandLogger.Info("Command Completed");
             }
         }
         public void Init()
         {
+            CommandLogger = new("Command", CommandName);
             MsgHandler.GetCommandHandler().CommandEvent += Handle;
-            CommandLogger.Info("Loaded");
+            CommandLogger.Info("Command Loaded");
         }
     }
 }

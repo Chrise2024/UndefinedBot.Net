@@ -8,13 +8,13 @@ namespace UndefinedBot.Net.Extra
 {
     public class EmojiMix
     {
-        public static int GetEmojiUnicodePoint(string EmojiString)
+        public static int GetEmojiUnicodePoint(string emojiString)
         {
             
             try{
-                if (EmojiString.Length > 0)
+                if (emojiString.Length > 0)
                 {
-                    StringRuneEnumerator SRE = EmojiString.EnumerateRunes();
+                    StringRuneEnumerator SRE = emojiString.EnumerateRunes();
                     foreach (Rune R in SRE)
                     {
                         return R.Value;
@@ -31,12 +31,12 @@ namespace UndefinedBot.Net.Extra
                 return 0;
             }
         }
-        public static string MixEmoji(List<string> EmojiStringArray)
+        public static string MixEmoji(List<string> emojiStringArray)
         {
-            if (EmojiStringArray.Count == 1)
+            if (emojiStringArray.Count == 1)
             {
                 List<string> LineElement = [];
-                TextElementEnumerator ElementEnumerator = StringInfo.GetTextElementEnumerator(EmojiStringArray[0]);
+                TextElementEnumerator ElementEnumerator = StringInfo.GetTextElementEnumerator(emojiStringArray[0]);
                 ElementEnumerator.Reset();
                 while (ElementEnumerator.MoveNext())
                 {
@@ -76,10 +76,10 @@ namespace UndefinedBot.Net.Extra
                     return "";
                 }
             }
-            else if (EmojiStringArray.Count > 1)
+            else if (emojiStringArray.Count > 1)
             {
-                int E1CP = GetEmojiUnicodePoint(EmojiStringArray[0]);
-                int E2CP = GetEmojiUnicodePoint(EmojiStringArray[1]);
+                int E1CP = GetEmojiUnicodePoint(emojiStringArray[0]);
+                int E2CP = GetEmojiUnicodePoint(emojiStringArray[1]);
                 string TUrlN = $"https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u{E1CP:X}/u{E1CP:X}_u{E2CP:X}.png".ToLower();
                 string TUrlR = $"https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u{E2CP:X}/u{E2CP:X}_u{E1CP:X}.png".ToLower();
                 byte[] Res = HttpRequest.GetBinary(TUrlN).Result;
@@ -105,9 +105,9 @@ namespace UndefinedBot.Net.Extra
                 return "";
             }
         }
-        private static bool IsEmoji(string TextElement)
+        private static bool IsEmoji(string textElement)
         {
-            UnicodeCategory UC = CharUnicodeInfo.GetUnicodeCategory(TextElement.Length > 0 ? TextElement[0] : ' ');
+            UnicodeCategory UC = CharUnicodeInfo.GetUnicodeCategory(textElement.Length > 0 ? textElement[0] : ' ');
             return UC == UnicodeCategory.OtherSymbol || UC == UnicodeCategory.ModifierSymbol ||
                    UC == UnicodeCategory.PrivateUse || UC == UnicodeCategory.Surrogate;
         }

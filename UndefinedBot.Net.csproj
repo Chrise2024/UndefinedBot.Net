@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="TemplateCommand.txt" />
+    <Resource Include="TemplateCommand.md" />
   </ItemGroup>
 
   <ItemGroup>
