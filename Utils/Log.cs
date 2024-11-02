@@ -8,22 +8,31 @@ namespace UndefinedBot.Net.Utils
 
         private readonly string _subType = subType;
 
-        private readonly ConsoleColor DefaultConsoleColor = Console.ForegroundColor;
+        private readonly ConsoleColor _defaultConsoleColor = Console.ForegroundColor;
         public void Error(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine("[{0}][{1}][{2}] {3}", GetFormatTime(),_nameSpace, _subType, message);
-            Console.ForegroundColor = DefaultConsoleColor;
+            PrintLine(message);
+            Console.ForegroundColor = _defaultConsoleColor;
         }
         public void Warn(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("[{0}][{1}][{2}] {3}", GetFormatTime(), _nameSpace, _subType, message);
-            Console.ForegroundColor = DefaultConsoleColor;
+            PrintLine(message);
+            Console.ForegroundColor = _defaultConsoleColor;
         }
         public void Info(string message)
         {
-            Console.WriteLine("[{0}][{1}][{2}] {3}", GetFormatTime(), _nameSpace, _subType, message);
+            Console.ForegroundColor = _defaultConsoleColor;
+            PrintLine(message);
+        }
+        private void PrintLine(string text)
+        {
+            string[] Lines = text.Split('\n',StringSplitOptions.RemoveEmptyEntries);
+            foreach (string line in Lines)
+            {
+                Console.WriteLine("[{0}][{1}][{2}] {3}", GetFormatTime(), _nameSpace, _subType, line);
+            }
         }
         private string GetFormatTime()
         {

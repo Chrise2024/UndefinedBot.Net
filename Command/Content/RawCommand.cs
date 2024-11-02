@@ -39,7 +39,7 @@ namespace UndefinedBot.Net.Command.Content
         public void Init()
         {
             CommandLogger = new("Command", CommandName);
-            MsgHandler.GetCommandHandler().CommandEvent += Handle;
+            CommandHandler.CommandEvent += Handle;
             CommandLogger.Info("Command Loaded");
         }
     }

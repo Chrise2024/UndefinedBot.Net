@@ -25,7 +25,7 @@ namespace UndefinedBot.Net
         public void Init()
         {
             CommandLogger = new("Command", CommandName);
-            MsgHandler.GetCommandHandler().CommandEvent += Handle;
+            CommandHandler.CommandEvent += Handle;
             CommandLogger.Info("Command Loaded");
         }
     }

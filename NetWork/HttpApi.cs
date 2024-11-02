@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UndefinedBot.Net;
 using UndefinedBot.Net.Utils;
+using UndefinedBot.Net.Command;
 
 namespace UndefinedBot.Net.NetWork
 {
@@ -282,5 +283,38 @@ namespace UndefinedBot.Net.NetWork
                 return [];
             }
         }
+    }
+    public struct HitokotoSchematics
+    {
+        [JsonProperty("id")] public int? Id;
+        [JsonProperty("uuid")] public string? Uuid;
+        [JsonProperty("hitokoto")] public string? Hitokoto;
+        [JsonProperty("type")] public string? Type;
+        [JsonProperty("from")] public string? From;
+        [JsonProperty("from_who")] public string? FromWho;
+        [JsonProperty("creator")] public string? Creator;
+        [JsonProperty("creator_uid")] public int? CreatorUid;
+        [JsonProperty("reviewer")] public int? Reviewer;
+        [JsonProperty("commit_from")] public string? CommitFrom;
+        [JsonProperty("created_at")] public string? CreatedAt;
+        [JsonProperty("length")] public int? Length;
+    }
+    public struct GroupMemberSchematics
+    {
+        [JsonProperty("group_id")] public long? GroupId;
+        [JsonProperty("user_id")] public long? UserId;
+        [JsonProperty("nickname")] public string? Nickname;
+        [JsonProperty("card")] public string? Card;
+        [JsonProperty("sex")] public string? Sex;
+        [JsonProperty("age")] public int? Age;
+        [JsonProperty("area")] public string? Area;
+        [JsonProperty("join_time")] public int? JoinTime;
+        [JsonProperty("last_sent_time")] public int? LastSentTime;
+        [JsonProperty("level")] public string? Level;
+        [JsonProperty("role")] public string? Role;
+        [JsonProperty("unfriendly")] public bool? Unfriendly;
+        [JsonProperty("title")] public string? Title;
+        [JsonProperty("title_expire_time")] public int? TitleExpireTime;
+        [JsonProperty("card_changeable")] public bool? CardChangeable;
     }
 }

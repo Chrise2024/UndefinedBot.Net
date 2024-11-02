@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using UndefinedBot.Net.NetWork;
 using UndefinedBot.Net.Utils;
@@ -74,7 +75,7 @@ namespace UndefinedBot.Net.Command.Content
         {
             
             CommandLogger = new("Command", CommandName);
-            MsgHandler.GetCommandHandler().CommandEvent += Handle;
+            CommandHandler.CommandEvent += Handle;
             CommandLogger.Info("Command Loaded");
         }
     }

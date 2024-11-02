@@ -182,4 +182,25 @@ namespace UndefinedBot.Net.Command
             return "";
         }
     }
+    public struct ArgSchematics(
+        string command,
+        List<string> param,
+        long callerUin,
+        long groupId,
+        int msgId,
+        bool status
+        )
+    {
+        public string Command = command;
+        public List<string> Param = param;
+        public long CallerUin = callerUin;
+        public long GroupId = groupId;
+        public int MsgId = msgId;
+        public bool Status = status;
+    }
+    public struct CQEntitySchematics(string CQType)
+    {
+        public string CQType = CQType;
+        public Dictionary<string, string> Properties;
+    }
 }

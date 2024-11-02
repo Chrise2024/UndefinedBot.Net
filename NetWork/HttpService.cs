@@ -12,39 +12,39 @@ namespace UndefinedBot.Net.NetWork
     public class HttpServer
     {
 
-        private readonly HttpListener s_httpListener = new();
+        private readonly HttpListener _httpListener = new();
 
-        private readonly Logger s_httpServerLogger = new("HttpServer");
+        private readonly Logger _httpServerLogger = new("HttpServer");
 
         public HttpServer(string Prefixe)
         {
-            s_httpListener.Prefixes.Add(Prefixe);
+            _httpListener.Prefixes.Add(Prefixe);
         }
         public async Task Start()
         {
-            s_httpListener.Start();
-            s_httpServerLogger.Info("Http Server Started");
-            while (s_httpListener.IsListening)
+            _httpListener.Start();
+            _httpServerLogger.Info("Http Server Started");
+            while (_httpListener.IsListening)
             {
                 try
                 {
-                    var context = await s_httpListener.GetContextAsync().WaitAsync(new CancellationToken());
+                    var context = await _httpListener.GetContextAsync().WaitAsync(new CancellationToken());
                     _ = HandleRequestAsync(context);
                     //catch { }
                 }
                 catch(Exception ex)
                 {
-                    s_httpServerLogger.Error("Error Occured, Error Information:");
-                    s_httpServerLogger.Error(ex.Message);
-                    s_httpServerLogger.Error(ex.StackTrace ?? "");
+                    _httpServerLogger.Error("Error Occured, Error Information:");
+                    _httpServerLogger.Error(ex.Message);
+                    _httpServerLogger.Error(ex.StackTrace ?? "");
                 }
             }
         }
         public void Stop()
         {
-            s_httpServerLogger.Info("Http Server Stopped");
-            s_httpListener.Stop();
-            s_httpListener.Close();
+            _httpServerLogger.Info("Http Server Stopped");
+            _httpListener.Stop();
+            _httpListener.Close();
         }
         private async Task HandleRequestAsync(HttpListenerContext context)
         {
@@ -56,13 +56,13 @@ namespace UndefinedBot.Net.NetWork
                 sr.Close();
                 context.Response.StatusCode = 200;
                 context.Response.Close();
-                await MsgHandler.HandleMsg(JsonConvert.DeserializeObject<MsgBodySchematics>(ReqString.Replace("-:/&]", "\\")));
+                await CommandHandler.HandleMsg(JsonConvert.DeserializeObject<MsgBodySchematics>(ReqString.Replace("-:/&]", "\\")));
             }
             catch (Exception ex)
             {
-                s_httpServerLogger.Error("Error Occured, Error Information:");
-                s_httpServerLogger.Error(ex.Message);
-                s_httpServerLogger.Error(ex.StackTrace ?? "");
+                _httpServerLogger.Error("Error Occured, Error Information:");
+                _httpServerLogger.Error(ex.Message);
+                _httpServerLogger.Error(ex.StackTrace ?? "");
             }
         }
     }

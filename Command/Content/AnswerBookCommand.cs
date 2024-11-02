@@ -1,26 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UndefinedBot.Net.Extra;
 using UndefinedBot.Net.NetWork;
 using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Command.Content
 {
-    public class HistodayCommand : IBaseCommand
+    public class AnswerBookCommand : IBaseCommand
     {
-        public string CommandName { get; private set; } = "histoday";
-        public string CommandDescription { get; private set; } = "{0}histoday - 历史上的今天\n使用方法：{0}histoday\ne.g. {0}histoday";
-        public string CommandShortDescription { get; private set; } = "{0}histoday - 历史上的今天";
-        public Logger CommandLogger { get; private set; } = new("Command", "Undefined");
+        public string CommandName { get; private set; } = "answerbook";
+        public string CommandDescription { get; private set; } = "{0}answerbook - 答案之书\n使用方法：{0}answerbook\ne.g. {0}answerbook";
+        public string CommandShortDescription { get; private set; } = "{0}answerbook - 答案之书";
+        public Logger CommandLogger { get; private set; } = new("Command", "AnswerBook");
         public async Task Execute(ArgSchematics args)
         {
-            string ImageCachePath = Histoday.GenHistodayImage();
             await HttpApi.SendGroupMsg(
                             args.GroupId,
                             new MsgBuilder()
-                                .Image(ImageCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()
+                                .Reply(args.MsgId)
+                                .Text(AnswerBook.GetAnswer()).Build()
                         );
-            FileIO.SafeDeleteFile(ImageCachePath);
-            CommandLogger.Info("Command Completed");
         }
         public async Task Handle(ArgSchematics args)
         {

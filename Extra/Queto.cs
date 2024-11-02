@@ -6,6 +6,7 @@ using SkiaSharp;
 using Newtonsoft.Json.Linq;
 using UndefinedBot.Net.NetWork;
 using UndefinedBot.Net.Utils;
+using UndefinedBot.Net.Command;
 
 namespace UndefinedBot.Net.Extra
 {
@@ -55,6 +56,8 @@ namespace UndefinedBot.Net.Extra
                 string QNNCachePath = Path.Join(Program.GetProgramCahce(), $"NickName_{DateTime.Now:HH-mm-ss}.png");
                 if (File.Exists(QSplashPath))
                 {
+                    //min: 108 max: 252 mid: 165
+                    //108-160-240
                     Image CoverImage = Image.FromFile(QSplashPath);
                     Image TargetAvatar = HttpApi.GetQQAvatar(TargetUin).Result;
                     Bitmap bg = new(1200, 640);

@@ -3,7 +3,6 @@ using System.Text;
 using System.Reflection;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UndefinedBot.Net.Command;
@@ -36,8 +35,8 @@ namespace UndefinedBot.Net
             Console.InputEncoding = Encoding.UTF8;
             FileIO.EnsurePath(ProgramCahce);
             FileIO.EnsurePath(ProgramLocal);
-            //Console.WriteLine(JsonConvert.SerializeObject(s_commandReference,Formatting.Indented));
-            MsgHandler.UpdateCommandList([.. s_commandReference.Keys]);
+            //Console.WriteLine("{0:x}",111);
+            CommandHandler.UpdateCommandList([.. s_commandReference.Keys]);
             if (!File.Exists(Path.Join(ProgramLocal, "QSplash.png")))
             {
                 Stream? stream = s_mainAssembly.GetManifestResourceStream("UndefinedBot.Net.Local.QSplash.png");

@@ -5,20 +5,6 @@ namespace UndefinedBot.Net.Utils
 {
     public partial class RegexProvider
     {
-        /*
-        private static readonly string CommandPrefix = Program.GetConfigManager().GetCommandPrefix();
-        public static string AtUinExtractor(string CQString)
-        {
-            Match m = GetCQAtRegex().Match(CQString);
-            return m.Success ? GetIdRegex().Match(m.Value).Value : "";
-        }
-        public static string ReplyIdExtractor(string CQString)
-        {
-            Match m = GetCQReplyRegex().Match(CQString);
-            return m.Success ? GetIdRegex().Match(m.Value).Value : "";
-        }
-        */
-
         [GeneratedRegex(@"\[CQ:\S+\]")]
         public static partial Regex GetCQEntityRegex();
 

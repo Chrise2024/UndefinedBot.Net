@@ -91,4 +91,16 @@ namespace UndefinedBot.Net.Utils
             FileIO.WriteAsJSON<ConfigSchematics>(_configPath, _config);
         }
     }
+    public struct ConfigSchematics(
+        string httpServerUrl,
+        string httpPostUrl,
+        List<long> groupId,
+        string commandPrefix
+        )
+    {
+        [JsonProperty("http_server_url")] public string HttpServerUrl = httpServerUrl;
+        [JsonProperty("http_post_url")] public string HttpPostUrl = httpPostUrl;
+        [JsonProperty("group_id")] public List<long> GroupId = groupId;
+        [JsonProperty("command_prefix")] public string CommandPrefix = commandPrefix;
+    }
 }
