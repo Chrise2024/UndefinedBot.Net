@@ -14,7 +14,7 @@ namespace UndefinedBot.Net.Extra
     {
         public static string GenQuetoImage(string targetMsgIdString)
         {
-            MsgBodySchematics TargetMsg = HttpApi.GetMsg(Int32.TryParse(targetMsgIdString, out int TargetMsgId) ? TargetMsgId : 0).Result;
+            MsgBodySchematics TargetMsg = Program.GetHttpApi().GetMsg(Int32.TryParse(targetMsgIdString, out int TargetMsgId) ? TargetMsgId : 0).Result;
             if ((TargetMsg.MessageId ?? 0) == 0)
             {
                 return "";
@@ -48,7 +48,7 @@ namespace UndefinedBot.Net.Extra
                     }
                 }
                 long TargetUin = TargetMsg.Sender?.UserId ?? 0;
-                GroupMemberSchematics CMember = HttpApi.GetGroupMember(TargetMsg.GroupId ?? 0, TargetUin).Result;
+                GroupMemberSchematics CMember = Program.GetHttpApi().GetGroupMember(TargetMsg.GroupId ?? 0, TargetUin).Result;
                 string TargetName = $"@{CMember.Nickname ?? ""}";
                 string ImCachePath = Path.Join(Program.GetProgramCahce(), $"{DateTime.Now:HH-mm-ss}.png");
                 string QSplashPath = Path.Join(Program.GetProgramLocal(), "QSplash.png");
@@ -59,7 +59,7 @@ namespace UndefinedBot.Net.Extra
                     //min: 108 max: 252 mid: 165
                     //108-160-240
                     Image CoverImage = Image.FromFile(QSplashPath);
-                    Image TargetAvatar = HttpApi.GetQQAvatar(TargetUin).Result;
+                    Image TargetAvatar = Program.GetHttpApi().GetQQAvatar(TargetUin).Result;
                     Bitmap bg = new(1200, 640);
                     Graphics g = Graphics.FromImage(bg);
                     g.DrawImage(TargetAvatar, 0, 0, 640, 640);

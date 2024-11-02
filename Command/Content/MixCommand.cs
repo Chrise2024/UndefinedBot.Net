@@ -18,7 +18,7 @@ namespace UndefinedBot.Net.Command.Content
                 string MixRes = EmojiMix.MixEmoji(args.Param);
                 if (MixRes.Length > 0)
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                                     args.GroupId,
                                     new MsgBuilder()
                                         .Reply(args.MsgId)
@@ -27,7 +27,7 @@ namespace UndefinedBot.Net.Command.Content
                 }
                 else
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                             args.GroupId,
                             new MsgBuilder()
                                 .Text("似乎不能混合").Build()

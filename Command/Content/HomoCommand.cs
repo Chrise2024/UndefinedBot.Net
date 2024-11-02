@@ -19,7 +19,7 @@ namespace UndefinedBot.Net.Command.Content
                 if (Status)
                 {
 
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                                         args.GroupId,
                                         new MsgBuilder()
                                             //.Reply(args.MsgId)
@@ -28,7 +28,7 @@ namespace UndefinedBot.Net.Command.Content
                 }
                 else
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                                         args.GroupId,
                                         new MsgBuilder()
                                             //.Reply(args.MsgId)

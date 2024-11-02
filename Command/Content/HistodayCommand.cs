@@ -14,7 +14,7 @@ namespace UndefinedBot.Net.Command.Content
         public async Task Execute(ArgSchematics args)
         {
             string ImageCachePath = Histoday.GenHistodayImage();
-            await HttpApi.SendGroupMsg(
+            await Program.GetHttpApi().SendGroupMsg(
                             args.GroupId,
                             new MsgBuilder()
                                 .Image(ImageCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()

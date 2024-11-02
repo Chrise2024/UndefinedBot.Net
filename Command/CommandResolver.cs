@@ -9,7 +9,7 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Command
 {
-    public class CommandResolver
+    internal class CommandResolver
     {
         private static readonly ArgSchematics s_invalidCommandArg = new("null", [], 0,  0, 0, false);
 

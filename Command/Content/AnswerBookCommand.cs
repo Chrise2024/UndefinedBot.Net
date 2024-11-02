@@ -17,7 +17,7 @@ namespace UndefinedBot.Net.Command.Content
         public Logger CommandLogger { get; private set; } = new("Command", "AnswerBook");
         public async Task Execute(ArgSchematics args)
         {
-            await HttpApi.SendGroupMsg(
+            await Program.GetHttpApi().SendGroupMsg(
                             args.GroupId,
                             new MsgBuilder()
                                 .Reply(args.MsgId)

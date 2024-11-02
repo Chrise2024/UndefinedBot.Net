@@ -9,7 +9,7 @@ using UndefinedBot.Net.Command;
 
 namespace UndefinedBot.Net.NetWork
 {
-    public class HttpServer
+    internal class HttpServer
     {
 
         private readonly HttpListener _httpListener = new();

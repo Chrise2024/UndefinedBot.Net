@@ -29,7 +29,7 @@ namespace UndefinedBot.Net.Command.Content
                 if (ImageCachePath.Length == 0)
                 {
                     CommandLogger.Error("Pic Convert Failed");
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                         args.GroupId,
                         new MsgBuilder()
                             .Text("似乎转换不了").Build()
@@ -37,7 +37,7 @@ namespace UndefinedBot.Net.Command.Content
                 }
                 else
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                                 args.GroupId,
                                 new MsgBuilder()
                                     .Reply(args.MsgId)

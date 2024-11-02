@@ -18,7 +18,7 @@ namespace UndefinedBot.Net.Command.Content
                 string OutUrl = RandomPicture.GetRandomContent(args.Param[0]);
                 if (OutUrl.Length > 0)
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                                     args.GroupId,
                                     new MsgBuilder()
                                         .Image(OutUrl, ImageSendType.Url).Build()
@@ -26,7 +26,7 @@ namespace UndefinedBot.Net.Command.Content
                 }
                 else
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                             args.GroupId,
                             new MsgBuilder()
                                 .Text("呃啊，图片迷路了").Build()

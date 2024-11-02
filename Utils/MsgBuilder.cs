@@ -21,7 +21,6 @@ namespace UndefinedBot.Net.Utils
     }
     public class MsgBuilder
     {
-
         private readonly List<JObject> _msgChain = [];
 
         public MsgBuilder Text(string text)

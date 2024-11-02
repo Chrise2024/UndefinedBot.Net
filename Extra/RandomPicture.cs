@@ -42,7 +42,7 @@ namespace UndefinedBot.Net.Extra
         {
             try
             {
-                JObject Resp = JObject.Parse(HttpRequest.Get($"https://www.bing.com/HPImageArchive.aspx?format=js&idx={s_randomRoot.Next(0, 32767)}&n=1").Result);
+                JObject Resp = JObject.Parse(Program.GetHttpRequest().Get($"https://www.bing.com/HPImageArchive.aspx?format=js&idx={s_randomRoot.Next(0, 32767)}&n=1").Result);
                 List<JObject> IA = Resp["images"]?.ToObject<List<JObject>>() ?? [];
                 if (IA.Count > 0)
                 {
@@ -69,7 +69,7 @@ namespace UndefinedBot.Net.Extra
             {
                 if (s_randomRoot.Next(1,100) > 64)
                 {
-                    List<JObject> IA = JsonConvert.DeserializeObject<List<JObject>>(HttpRequest.Get("https://api.thecatapi.com/v1/images/search").Result) ?? [];
+                    List<JObject> IA = JsonConvert.DeserializeObject<List<JObject>>(Program.GetHttpRequest().Get("https://api.thecatapi.com/v1/images/search").Result) ?? [];
                     if (IA.Count > 0)
                     {
                         return IA[0].Value<string>("url") ?? "";
@@ -81,7 +81,7 @@ namespace UndefinedBot.Net.Extra
                 }
                 else
                 {
-                    JObject Resp = JObject.Parse(HttpRequest.Get("https://nekobot.xyz/api/image?type=neko").Result);
+                    JObject Resp = JObject.Parse(Program.GetHttpRequest().Get("https://nekobot.xyz/api/image?type=neko").Result);
                     return Resp.Value<string>("message") ?? "";
                 }
             }
@@ -94,14 +94,14 @@ namespace UndefinedBot.Net.Extra
         {
             try
             {
-                List<JObject> IA = JsonConvert.DeserializeObject<List<JObject>>(HttpRequest.Get("https://api.thedogapi.com/v1/images/search").Result) ?? [];
+                List<JObject> IA = JsonConvert.DeserializeObject<List<JObject>>(Program.GetHttpRequest().Get("https://api.thedogapi.com/v1/images/search").Result) ?? [];
                 if (IA.Count > 0)
                 {
                     return IA[0].Value<string>("url") ?? "";
                 }
                 else
                 {
-                    JObject Resp = JObject.Parse(HttpRequest.Get("https://dog.ceo/api/breeds/image/random").Result);
+                    JObject Resp = JObject.Parse(Program.GetHttpRequest().Get("https://dog.ceo/api/breeds/image/random").Result);
                     return Resp.Value<string>("message") ?? "";
                 }
             }
@@ -116,11 +116,11 @@ namespace UndefinedBot.Net.Extra
             {
                 if (s_randomRoot.Next(1, 100) > 75)
                 {
-                    return HttpRequest.Get("https://www.loliapi.com/bg/?type=url").Result.Replace(".cn", ".com");
+                    return Program.GetHttpRequest().Get("https://www.loliapi.com/bg/?type=url").Result.Replace(".cn", ".com");
                 }
                 else
                 {
-                    JObject Resp = JObject.Parse(HttpRequest.Get("https://iw233.cn/api.php?sort=cdniw&type=json").Result);
+                    JObject Resp = JObject.Parse(Program.GetHttpRequest().Get("https://iw233.cn/api.php?sort=cdniw&type=json").Result);
                     List<string> IA = Resp["pic"]?.ToObject<List<string>>() ?? [];
                     return IA.Count > 0 ? IA[0] : "";
                 }
@@ -134,7 +134,7 @@ namespace UndefinedBot.Net.Extra
         {
             try
             {
-                JObject Resp = JObject.Parse(HttpRequest.Get("https://moe.jitsu.top/api/?sort=starry&type=json").Result);
+                JObject Resp = JObject.Parse(Program.GetHttpRequest().Get("https://moe.jitsu.top/api/?sort=starry&type=json").Result);
                 List<string> IA = Resp["pics"]?.ToObject<List<string>>() ?? [];
                 return IA.Count > 0 ? IA[0] : "";
             }

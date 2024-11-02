@@ -23,20 +23,20 @@ namespace UndefinedBot.Net.Extra
             MemoryStream? Ms;
             if (contentType == ImageContentType.Url)
             {
-                byte[] ImageBytes = HttpRequest.GetBinary(imageContent).Result;
+                byte[] ImageBytes = Program.GetHttpRequest().GetBinary(imageContent).Result;
                 Ms = new MemoryStream(ImageBytes);
                 Im = Image.FromStream(Ms);
             }
             else
             {
-                MsgBodySchematics TargetMsg = HttpApi.GetMsg(imageContent).Result;
+                MsgBodySchematics TargetMsg = Program.GetHttpApi().GetMsg(imageContent).Result;
                 if ((TargetMsg.MessageId ?? 0) == 0)
                 {
                     return "";
                 }
                 else
                 {
-                    byte[] ImageBytes = HttpRequest.GetBinary(CommandResolver.ExtractUrlFromMsg(TargetMsg)).Result;
+                    byte[] ImageBytes = Program.GetHttpRequest().GetBinary(CommandResolver.ExtractUrlFromMsg(TargetMsg)).Result;
                     Ms = new MemoryStream(ImageBytes);
                     Im = Image.FromStream(Ms);
                 }

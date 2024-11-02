@@ -15,8 +15,8 @@ namespace UndefinedBot.Net.Command.Content
         {
             if (args.Param.Count > 0)
             {
-                MsgBodySchematics TargetMsg = await HttpApi.GetMsg(args.Param[0]);
-                await HttpApi.SendGroupMsg(
+                MsgBodySchematics TargetMsg = await Program.GetHttpApi().GetMsg(args.Param[0]);
+                await Program.GetHttpApi().SendGroupMsg(
                                 args.GroupId,
                                 new MsgBuilder()
                                     .Text(JsonConvert.SerializeObject(TargetMsg.Message, Formatting.Indented)).Build()

@@ -19,7 +19,7 @@ namespace UndefinedBot.Net.Command.Content
                 if (ImageCachePath.Length == 0)
                 {
                     CommandLogger.Error("Generate Failed");
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                         args.GroupId,
                         new MsgBuilder()
                             .Text("生成出错了").Build()
@@ -27,7 +27,7 @@ namespace UndefinedBot.Net.Command.Content
                 }
                 else
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                             args.GroupId,
                             new MsgBuilder()
                                 .Image(ImageCachePath, ImageSendType.LocalFile, ImageSubType.Normal).Build()

@@ -53,10 +53,10 @@ namespace UndefinedBot.Net.Extra
                     int E2CP = GetEmojiUnicodePoint(LineElement[1]);
                     string TUrlN = $"https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u{E1CP:x}/u{E1CP:x}_u{E2CP:x}.png";
                     string TUrlR = $"https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u{E2CP:x}/u{E2CP:x}_u{E1CP:x}.png";
-                    byte[] Res = HttpRequest.GetBinary(TUrlN).Result;
+                    byte[] Res = Program.GetHttpRequest().GetBinary(TUrlN).Result;
                     if (Res.Length == 0 || Res[0] != 0x89)
                     {
-                        Res = HttpRequest.GetBinary(TUrlR).Result;
+                        Res = Program.GetHttpRequest().GetBinary(TUrlR).Result;
                         if (Res.Length == 0 || Res[0] != 0x89)
                         {
                             return "";
@@ -82,10 +82,10 @@ namespace UndefinedBot.Net.Extra
                 int E2CP = GetEmojiUnicodePoint(emojiStringArray[1]);
                 string TUrlN = $"https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u{E1CP:X}/u{E1CP:X}_u{E2CP:X}.png".ToLower();
                 string TUrlR = $"https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u{E2CP:X}/u{E2CP:X}_u{E1CP:X}.png".ToLower();
-                byte[] Res = HttpRequest.GetBinary(TUrlN).Result;
+                byte[] Res = Program.GetHttpRequest().GetBinary(TUrlN).Result;
                 if (Res.Length == 0 || Res[0] != 0x89)
                 {
-                    Res = HttpRequest.GetBinary(TUrlR).Result;
+                    Res = Program.GetHttpRequest().GetBinary(TUrlR).Result;
                     if (Res.Length == 0 || Res[0] != 0x89)
                     {
                         return "";

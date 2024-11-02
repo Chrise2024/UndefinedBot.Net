@@ -5,7 +5,7 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Command
 {
-    public class CommandInitializer
+    internal class CommandInitializer
     {
         private static readonly Assembly s_initializerAssembly = Assembly.GetExecutingAssembly();
         public static Dictionary<string,CommandPropertieSchematics> InitCommand()

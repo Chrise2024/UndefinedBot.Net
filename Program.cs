@@ -14,13 +14,17 @@ namespace UndefinedBot.Net
 {
     public class Program
     {
-        private static readonly string ProgramRoot = Environment.CurrentDirectory;
+        private static readonly string s_programRoot = Environment.CurrentDirectory;
 
-        private static readonly string ProgramCahce = Path.Join(ProgramRoot, "Cache");
+        private static readonly string s_programCahce = Path.Join(s_programRoot, "Cache");
 
-        private static readonly string ProgramLocal = Path.Join(ProgramRoot, "Local");
+        private static readonly string s_programLocal = Path.Join(s_programRoot, "Local");
 
         private static readonly ConfigManager s_mainConfigManager = new();
+
+        private static readonly HttpApi s_httpApi = new(s_mainConfigManager.GetHttpPostUrl());
+
+        private static readonly HttpRequest s_httpRequest = new();
 
         private static readonly HttpServer s_httpServer = new(s_mainConfigManager.GetHttpServerUrl());
 
@@ -33,17 +37,17 @@ namespace UndefinedBot.Net
         {
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
-            FileIO.EnsurePath(ProgramCahce);
-            FileIO.EnsurePath(ProgramLocal);
+            FileIO.EnsurePath(s_programCahce);
+            FileIO.EnsurePath(s_programLocal);
             //Console.WriteLine("{0:x}",111);
             CommandHandler.UpdateCommandList([.. s_commandReference.Keys]);
-            if (!File.Exists(Path.Join(ProgramLocal, "QSplash.png")))
+            if (!File.Exists(Path.Join(s_programLocal, "QSplash.png")))
             {
                 Stream? stream = s_mainAssembly.GetManifestResourceStream("UndefinedBot.Net.Local.QSplash.png");
                 if (stream != null)
                 {
                     Image CoverImage = Image.FromStream(stream);
-                    CoverImage.Save(Path.Join(ProgramLocal, "QSplash.png"), ImageFormat.Png);
+                    CoverImage.Save(Path.Join(s_programLocal, "QSplash.png"), ImageFormat.Png);
                     CoverImage.Dispose();
                 }
                 stream?.Close();
@@ -65,19 +69,27 @@ namespace UndefinedBot.Net
         }
         public static string GetProgramRoot()
         {
-            return ProgramRoot;
+            return s_programRoot;
         }
         public static string GetProgramCahce()
         {
-            return ProgramCahce;
+            return s_programCahce;
         }
         public static string GetProgramLocal()
         {
-            return ProgramLocal;
+            return s_programLocal;
         }
         public static ConfigManager GetConfigManager()
         {
             return s_mainConfigManager;
+        }
+        public static HttpApi GetHttpApi()
+        {
+            return s_httpApi;
+        }
+        public static HttpRequest GetHttpRequest()
+        {
+            return s_httpRequest;
         }
         public static Dictionary<string,CommandPropertieSchematics> GetCommandReference()
         {

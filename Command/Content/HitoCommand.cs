@@ -12,10 +12,10 @@ namespace UndefinedBot.Net.Command.Content
         public Logger CommandLogger { get; private set; } = new("Command", "Undefined");
         public async Task Execute(ArgSchematics args)
         {
-            HitokotoSchematics Hitokoto = await HttpApi.GetHitokoto(args.Param.Count > 0 ? args.Param[0] : "");
+            HitokotoSchematics Hitokoto = await Program.GetHttpApi().GetHitokoto(args.Param.Count > 0 ? args.Param[0] : "");
             if ((Hitokoto.Id ?? 0) != 0)
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                             args.GroupId,
                             new MsgBuilder()
                                 .Text($"{Hitokoto.Hitokoto}\n---- {Hitokoto.Creator}").Build()
@@ -24,7 +24,7 @@ namespace UndefinedBot.Net.Command.Content
                 else
                 {
                     CommandLogger.Error($"Get Hitokoto Failed");
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                             args.GroupId,
                             new MsgBuilder()
                                 .Text("一言似乎迷路了").Build()

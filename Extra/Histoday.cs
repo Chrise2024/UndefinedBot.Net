@@ -20,7 +20,7 @@ namespace UndefinedBot.Net.Extra
         public static string GenHistodayImage()
         {
             string CurrentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + $"\n{ZhCNCalendar.GetDayOfWeek(DateTime.Now)}";
-            string Content = HttpRequest.Get("https://xiaoapi.cn/API/lssdjt.php").Result;
+            string Content = Program.GetHttpRequest().Get("https://xiaoapi.cn/API/lssdjt.php").Result;
             Bitmap bg = new(1080,1500);
             Graphics g = Graphics.FromImage(bg);
             g.Clear(Color.White);

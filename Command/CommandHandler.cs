@@ -6,8 +6,8 @@ using UndefinedBot.Net.Utils;
 
 namespace UndefinedBot.Net.Command
 {
-    public delegate Task CommandEventHandler(ArgSchematics CommandArg);
-    public class CommandHandler
+    internal delegate Task CommandEventHandler(ArgSchematics CommandArg);
+    internal class CommandHandler
     {
         private static readonly List<long> s_workGRoup = Program.GetConfigManager().GetGroupList();
 
@@ -30,12 +30,11 @@ namespace UndefinedBot.Net.Command
                     {
                         s_commandHandlerLogger.Info("Executing with arg:");
                         s_commandHandlerLogger.Info(JsonConvert.SerializeObject(args,Formatting.Indented));
-                        //s_commandHandler.Trigger(args);
                         CommandEvent?.Invoke(args);
                     }
                     else
                     {
-                        await HttpApi.SendGroupMsg(
+                        await Program.GetHttpApi().SendGroupMsg(
                                 args.GroupId,
                                 new MsgBuilder()
                                     .Text($"这发的什么东西: <{args.Command}>").Build()

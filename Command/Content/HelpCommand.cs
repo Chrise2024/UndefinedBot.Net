@@ -24,7 +24,7 @@ namespace UndefinedBot.Net.Command.Content
             {
                 if (Program.GetCommandReference().TryGetValue(args.Param[0], out var Prop))
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                         args.GroupId,
                         new MsgBuilder()
                             .Text(string.Format(Prop.Description, _commandPrefix)).Build()
@@ -32,7 +32,7 @@ namespace UndefinedBot.Net.Command.Content
                 }
                 else
                 {
-                    await HttpApi.SendGroupMsg(
+                    await Program.GetHttpApi().SendGroupMsg(
                         args.GroupId,
                         new MsgBuilder()
                             .Text("咦，没有这个指令").Build()
@@ -55,7 +55,7 @@ namespace UndefinedBot.Net.Command.Content
                         "使用#help+具体指令查看使用方法\ne.g. #help symmet";
                     _commonHelpText = string.Format(_commonHelpText, _commandPrefix);
                 }
-                await HttpApi.SendGroupMsg(
+                await Program.GetHttpApi().SendGroupMsg(
                             args.GroupId,
                             new MsgBuilder()
                                 .Text(_commonHelpText).Build()
